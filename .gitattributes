@@ -1,0 +1,7 @@
+# Calculator variable files are binary containers. Mark them so no CRLF
+# conversion can touch them, whatever core.autocrlf is set to locally.
+*.89[a-z] -text
+
+# Show .89p programs as TI-BASIC source in diffs. Enable once per clone with:
+#     git config include.path ../.gitconfig
+*.89p diff=ti89
