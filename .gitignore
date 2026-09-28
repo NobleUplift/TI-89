@@ -1,0 +1,15 @@
+*.89k
+PERIODIC2/
+__pycache__/
+*.bak
+
+# Not ours to redistribute: TI's stock StudyCard stacks ("SAMPLE ONLY"),
+# and main.calculus, which is College Board material.
+MAIN/StudyCards/main.calculus.89y
+MAIN/StudyCards/main.math1.89y
+MAIN/StudyCards/main.math2.89y
+MAIN/StudyCards/main.math3.89y
+MAIN/StudyCards/main.science1.89y
+MAIN/StudyCards/main.science2.89y
+MAIN/StudyCards/main.science3.89y
+MAIN/StudyCards/main.tiinfo.89y
