@@ -1,0 +1,76 @@
+()
+Prgm
+© entropy: Shannon entropy H(S) = -Σ p·log2(p)
+© F1: type counts or probabilities as a list, in
+© braces, e.g. {16,14} or {.25,.25,.5}.
+© F2: type one raw label per sample as a list, in
+© braces, e.g. {1,1,1,2,2}; tallies how many times
+© each distinct value occurs before computing H.
+© Uses Input, not Request: Request's dialog starts in
+© Alpha-Lock (meant for names), forcing Alpha off before
+© every numeric entry. Input's entry line starts in
+© normal mode, like the Home screen, so digits and { }
+© type directly; only cost is typing the braces yourself.
+Local p,r,c,n,i,cur,h,mx
+
+Lbl top
+ClrIO
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","","F1: Enter counts","F2: Tally raw labels","F3: Quit"
+Toolbar
+Title "Enter",ask
+Title "Tally",tally
+Title "Quit",quit
+EndTBar
+Goto top
+
+Lbl ask
+Input "Counts, e.g. {16,14}",p
+Goto calc
+
+Lbl tally
+Input "Labels, e.g. {1,1,2}",r
+If dim(r)<1
+Goto top
+SortA r
+{1}→c
+r[1]→cur
+For i,2,dim(r)
+If r[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+r[i]→cur
+EndIf
+EndFor
+c→p
+
+Lbl calc
+If dim(p)<1 or min(p)<0
+Goto top
+sum(p)→n
+If n≤0
+Goto top
+p/n→p
+
+0→h
+For i,1,dim(p)
+If p[i]>0
+h-p[i]*ln(p[i])/ln(2)→h
+EndFor
+
+If dim(p)>1
+ln(dim(p))/ln(2)→mx
+If dim(p)=1
+0→mx
+
+ClrIO
+Disp "H(S) = "&string(round(h,4))&" bits"
+If mx>0
+Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*h/mx,2))&"%"
+Pause
+Goto top
+
+Lbl quit
+ClrIO
+DispHome
+EndPrgm
