@@ -5,15 +5,17 @@ Prgm
 ©  Manual: type counts or probabilities as a list, in
 ©   braces, e.g. {16,14} or {.25,.25,.5}. For learning
 ©   the arithmetic once you've counted by hand.
-©  Tally: type one raw label per sample as a list, in
-©   braces, e.g. {1,1,1,2,2}, or a Data variable column
-©   (e.g. mydata[1]) in place of a literal list -- Input
-©   evaluates whatever is typed. Tallies occurrences of
-©   each distinct value itself before computing H.
+©  Automatic: type one raw label per sample as a list,
+©   in braces, e.g. {1,1,1,2,2}, or a Data variable
+©   column (e.g. mydata[1]) in place of a literal list
+©   -- Input evaluates whatever is typed. Tallies
+©   occurrences of each distinct value itself before
+©   computing H.
 © F2 I.G. (information gain) menu, for a split into
 © several children:
 ©  Manual: asks how many children, then each child's
-©   raw labels (literal list or db[col], same as Tally).
+©   raw labels (literal list or db[col], same as F1's
+©   Automatic).
 ©   You decide which rows belong to which child; the
 ©   parent is never entered separately, since pooling
 ©   all children's labels reconstructs it exactly. For
@@ -27,7 +29,11 @@ Prgm
 ©   Input, not the combined Matrix built for viewing the
 ©   whole table: a Matrix's column extraction isn't a
 ©   verified primitive here, while db[col] already is.
-© F3: Quit.
+© F3: About (credits) and Quit. Every top-level Title has
+© Items nested under it, including this one, matching
+© this repo's own convention (see discrete\baseconv):
+© a Title is always a menu to open, never an action by
+© itself.
 © Uses Input, not Request: Request's dialog starts in
 © Alpha-Lock (meant for names), forcing Alpha off before
 © every numeric entry. Input's entry line starts in
@@ -37,15 +43,17 @@ Local p,r,c,n,i,m,cur,cur2,h,h2,mx,k,j,all,sumnh,wtd,y,yp,child
 
 Lbl top
 ClrIO
-Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: Quit"
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
 Toolbar
 Title "Entropy"
 Item "Manual",ask
-Item "Tally",tally
+Item "Automatic",tally
 Title "I.G."
 Item "Manual",gain
 Item "Automatic",auto
-Title "Quit",quit
+Title "About"
+Item "About",about
+Item "Quit",quit
 EndTBar
 Goto top
 
@@ -244,6 +252,16 @@ sumnh/dim(y)→wtd
 ClrIO
 Disp "Parent H = "&string(round(h,4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(h-wtd,4))&" bits"
 Pause
+Goto top
+
+Lbl about
+Dialog
+Title "Shannon Entropy"
+Text "Entropy & information gain"
+Text "for the TI-89"
+Text "By Patrick Seiter and"
+Text "Claude (Anthropic), 2026"
+EndDlog
 Goto top
 
 Lbl quit
