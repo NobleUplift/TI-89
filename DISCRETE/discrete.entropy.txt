@@ -1,37 +1,50 @@
 ()
 Prgm
 © entropy: Shannon entropy H(S) = -Σ p·log2(p)
-© F1: type counts or probabilities as a list, in
-© braces, e.g. {16,14} or {.25,.25,.5}.
-© F2: type one raw label per sample as a list, in
-© braces, e.g. {1,1,1,2,2}; tallies how many times
-© each distinct value occurs before computing H.
-© F2 also accepts a Data variable's column directly,
-© e.g. mydata[1], instead of a literal list: Input
-© evaluates whatever is typed, so this reads existing
-© table data with no separate read routine needed.
-© F3: information gain of a split into k children.
-© Asks how many children, then each child's raw labels
-© (literal list or db[col], same as F2). The parent is
-© never entered separately: since every parent sample
-© falls in exactly one child, pooling all children's
-© labels reconstructs the parent exactly, so info gain
-© = H(parent) - Σ(n(child)/N)·H(child) needs only the
-© children as input, N = total samples over all children.
+© F1 Entropy menu:
+©  Manual: type counts or probabilities as a list, in
+©   braces, e.g. {16,14} or {.25,.25,.5}. For learning
+©   the arithmetic once you've counted by hand.
+©  Tally: type one raw label per sample as a list, in
+©   braces, e.g. {1,1,1,2,2}, or a Data variable column
+©   (e.g. mydata[1]) in place of a literal list -- Input
+©   evaluates whatever is typed. Tallies occurrences of
+©   each distinct value itself before computing H.
+© F2 I.G. (information gain) menu, for a split into
+© several children:
+©  Manual: asks how many children, then each child's
+©   raw labels (literal list or db[col], same as Tally).
+©   You decide which rows belong to which child; the
+©   parent is never entered separately, since pooling
+©   all children's labels reconstructs it exactly. For
+©   learning how a split's gain is actually assembled.
+©  Automatic: asks for a whole attribute column and a
+©   whole class-label column (e.g. mydata[1], mydata[2]);
+©   groups rows into children by matching attribute
+©   value itself (SortA on both together keeps each row's
+©   class label attached to its attribute value), so no
+©   manual grouping at all. Deliberately plain Data-column
+©   Input, not the combined Matrix built for viewing the
+©   whole table: a Matrix's column extraction isn't a
+©   verified primitive here, while db[col] already is.
+© F3: Quit.
 © Uses Input, not Request: Request's dialog starts in
 © Alpha-Lock (meant for names), forcing Alpha off before
 © every numeric entry. Input's entry line starts in
 © normal mode, like the Home screen, so digits and { }
 © type directly; only cost is typing the braces yourself.
-Local p,r,c,n,i,cur,h,mx,k,j,all,sumnh,wtd
+Local p,r,c,n,i,m,cur,cur2,h,h2,mx,k,j,all,sumnh,wtd,y,yp,child
 
 Lbl top
 ClrIO
-Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1:Counts F2:Tally","F3:Gain F4:Quit"
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: Quit"
 Toolbar
-Title "Enter",ask
-Title "Tally",tally
-Title "Gain",gain
+Title "Entropy"
+Item "Manual",ask
+Item "Tally",tally
+Title "I.G."
+Item "Manual",gain
+Item "Automatic",auto
 Title "Quit",quit
 EndTBar
 Goto top
@@ -136,6 +149,97 @@ If p[i]>0
 h-p[i]*ln(p[i])/ln(2)→h
 EndFor
 sumnh/n→wtd
+
+ClrIO
+Disp "Parent H = "&string(round(h,4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(h-wtd,4))&" bits"
+Pause
+Goto top
+
+Lbl auto
+Input "Attribute col, e.g. db[1]",r
+Input "Class col, e.g. db[2]",y
+If dim(r)<1 or dim(r)≠dim(y)
+Goto top
+
+© parent entropy: tally a sorted copy of y, so y itself
+© stays row-aligned with r for the grouping pass below
+y→yp
+SortA yp
+{1}→c
+yp[1]→cur
+For i,2,dim(yp)
+If yp[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+yp[i]→cur
+EndIf
+EndFor
+sum(c)→n
+c/n→p
+0→h
+For i,1,dim(p)
+If p[i]>0
+h-p[i]*ln(p[i])/ln(2)→h
+EndFor
+
+© group rows into children by attribute value: sorting
+© r,y together keeps each class label attached to its
+© own row's attribute value
+SortA r,y
+{y[1]}→child
+r[1]→cur
+0→sumnh
+For i,2,dim(r)
+If r[i]=cur Then
+augment(child,{y[i]})→child
+Else
+SortA child
+{1}→c
+child[1]→cur2
+For m,2,dim(child)
+If child[m]=cur2 Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+child[m]→cur2
+EndIf
+EndFor
+sum(c)→n
+c/n→p
+0→h2
+For m,1,dim(p)
+If p[m]>0
+h2-p[m]*ln(p[m])/ln(2)→h2
+EndFor
+sumnh+n*h2→sumnh
+{y[i]}→child
+r[i]→cur
+EndIf
+EndFor
+
+© finalize the last (trailing) child
+SortA child
+{1}→c
+child[1]→cur2
+For m,2,dim(child)
+If child[m]=cur2 Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+child[m]→cur2
+EndIf
+EndFor
+sum(c)→n
+c/n→p
+0→h2
+For m,1,dim(p)
+If p[m]>0
+h2-p[m]*ln(p[m])/ln(2)→h2
+EndFor
+sumnh+n*h2→sumnh
+
+sumnh/dim(y)→wtd
 
 ClrIO
 Disp "Parent H = "&string(round(h,4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(h-wtd,4))&" bits"
