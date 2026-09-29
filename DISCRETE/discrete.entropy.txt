@@ -6,6 +6,10 @@ Prgm
 © F2: type one raw label per sample as a list, in
 © braces, e.g. {1,1,1,2,2}; tallies how many times
 © each distinct value occurs before computing H.
+© F2 also accepts a Data variable's column directly,
+© e.g. mydata[1], instead of a literal list: Input
+© evaluates whatever is typed, so this reads existing
+© table data with no separate read routine needed.
 © Uses Input, not Request: Request's dialog starts in
 © Alpha-Lock (meant for names), forcing Alpha off before
 © every numeric entry. Input's entry line starts in
@@ -15,7 +19,7 @@ Local p,r,c,n,i,cur,h,mx
 
 Lbl top
 ClrIO
-Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","","F1: Enter counts","F2: Tally raw labels","F3: Quit"
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","","F1: Enter counts","F2: Tally list/data","F3: Quit"
 Toolbar
 Title "Enter",ask
 Title "Tally",tally
@@ -28,7 +32,7 @@ Input "Counts, e.g. {16,14}",p
 Goto calc
 
 Lbl tally
-Input "Labels, e.g. {1,1,2}",r
+Input "Labels or db[col]",r
 If dim(r)<1
 Goto top
 SortA r
