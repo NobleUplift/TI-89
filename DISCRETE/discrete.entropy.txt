@@ -30,10 +30,13 @@ Prgm
 ©   whole table: a Matrix's column extraction isn't a
 ©   verified primitive here, while db[col] already is.
 © F3: About (credits) and Quit. Every top-level Title has
-© Items nested under it, including this one, matching
-© this repo's own convention (see discrete\baseconv):
-© a Title is always a menu to open, never an action by
-© itself.
+© Items nested under it, including this one: a Title is
+© always a menu to open, never an action by itself. This
+© matches main\kbdprgm3's own "Mathematics" Title, which
+© nests a single Item ("Main Program") specifically
+© because a direct-jump Title once confused users who
+© expected to press F1 into a dropdown -- documented in
+© that program's own Info screen as a lesson learned.
 © Uses Input, not Request: Request's dialog starts in
 © Alpha-Lock (meant for names), forcing Alpha off before
 © every numeric entry. Input's entry line starts in
