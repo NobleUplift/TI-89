@@ -10,19 +10,28 @@ Prgm
 © e.g. mydata[1], instead of a literal list: Input
 © evaluates whatever is typed, so this reads existing
 © table data with no separate read routine needed.
+© F3: information gain of a split into k children.
+© Asks how many children, then each child's raw labels
+© (literal list or db[col], same as F2). The parent is
+© never entered separately: since every parent sample
+© falls in exactly one child, pooling all children's
+© labels reconstructs the parent exactly, so info gain
+© = H(parent) - Σ(n(child)/N)·H(child) needs only the
+© children as input, N = total samples over all children.
 © Uses Input, not Request: Request's dialog starts in
 © Alpha-Lock (meant for names), forcing Alpha off before
 © every numeric entry. Input's entry line starts in
 © normal mode, like the Home screen, so digits and { }
 © type directly; only cost is typing the braces yourself.
-Local p,r,c,n,i,cur,h,mx
+Local p,r,c,n,i,cur,h,mx,k,j,all,sumnh,wtd
 
 Lbl top
 ClrIO
-Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","","F1: Enter counts","F2: Tally list/data","F3: Quit"
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1:Counts F2:Tally","F3:Gain F4:Quit"
 Toolbar
 Title "Enter",ask
 Title "Tally",tally
+Title "Gain",gain
 Title "Quit",quit
 EndTBar
 Goto top
@@ -71,6 +80,65 @@ ClrIO
 Disp "H(S) = "&string(round(h,4))&" bits"
 If mx>0
 Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*h/mx,2))&"%"
+Pause
+Goto top
+
+Lbl gain
+Input "Number of children",k
+If k<2
+Goto top
+{}→all
+0→sumnh
+For j,1,k
+ClrIO
+Disp "Child "&string(j)&" of "&string(k)
+Input "Labels or db[col]",r
+If dim(r)<1
+Goto top
+augment(all,r)→all
+SortA r
+{1}→c
+r[1]→cur
+For i,2,dim(r)
+If r[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+r[i]→cur
+EndIf
+EndFor
+sum(c)→n
+c/n→p
+0→h
+For i,1,dim(p)
+If p[i]>0
+h-p[i]*ln(p[i])/ln(2)→h
+EndFor
+sumnh+n*h→sumnh
+EndFor
+
+SortA all
+{1}→c
+all[1]→cur
+For i,2,dim(all)
+If all[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+all[i]→cur
+EndIf
+EndFor
+sum(c)→n
+c/n→p
+0→h
+For i,1,dim(p)
+If p[i]>0
+h-p[i]*ln(p[i])/ln(2)→h
+EndFor
+sumnh/n→wtd
+
+ClrIO
+Disp "Parent H = "&string(round(h,4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(h-wtd,4))&" bits"
 Pause
 Goto top
 
