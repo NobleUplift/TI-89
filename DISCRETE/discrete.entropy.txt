@@ -1,47 +1,7 @@
 ()
 Prgm
 © entropy: Shannon entropy H(S) = -Σ p·log2(p)
-© F1 Entropy menu:
-©  Manual: type counts or probabilities as a list, in
-©   braces, e.g. {16,14} or {.25,.25,.5}. For learning
-©   the arithmetic once you've counted by hand.
-©  Automatic: type one raw label per sample as a list,
-©   in braces, e.g. {1,1,1,2,2}, or a Data variable
-©   column (e.g. mydata[1]) in place of a literal list
-©   -- Input evaluates whatever is typed. Tallies
-©   occurrences of each distinct value itself before
-©   computing H.
-© F2 I.G. (information gain) menu, for a split into
-© several children:
-©  Manual: asks how many children, then each child's
-©   raw labels (literal list or db[col], same as F1's
-©   Automatic).
-©   You decide which rows belong to which child; the
-©   parent is never entered separately, since pooling
-©   all children's labels reconstructs it exactly. For
-©   learning how a split's gain is actually assembled.
-©  Automatic: asks for a whole attribute column and a
-©   whole class-label column (e.g. mydata[1], mydata[2]);
-©   groups rows into children by matching attribute
-©   value itself (SortA on both together keeps each row's
-©   class label attached to its attribute value), so no
-©   manual grouping at all. Deliberately plain Data-column
-©   Input, not the combined Matrix built for viewing the
-©   whole table: a Matrix's column extraction isn't a
-©   verified primitive here, while db[col] already is.
-© F3: About (credits) and Quit. Every top-level Title has
-© Items nested under it, including this one: a Title is
-© always a menu to open, never an action by itself. This
-© matches main\kbdprgm3's own "Mathematics" Title, which
-© nests a single Item ("Main Program") specifically
-© because a direct-jump Title once confused users who
-© expected to press F1 into a dropdown -- documented in
-© that program's own Info screen as a lesson learned.
-© Uses Input, not Request: Request's dialog starts in
-© Alpha-Lock (meant for names), forcing Alpha off before
-© every numeric entry. Input's entry line starts in
-© normal mode, like the Home screen, so digits and { }
-© type directly; only cost is typing the braces yourself.
+© F1 Entropy, F2 I.G., F3 About/Quit -- see DISCRETE/README.md
 Local p,r,c,n,i,m,cur,cur2,h,h2,mx,k,j,all,sumnh,wtd,y,yp,child
 
 Lbl top
