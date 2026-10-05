@@ -1,9 +1,15 @@
 # TI-89 Titanium
 
-A full backup of a TI-89 Titanium graphing calculator, taken on 27 January 2009. It holds
-the Marist High School math team's accumulated program set: 142 calculator variables in this
-repository, plus four submodules, written between 1998 and 2008 by eleven students and eight
-outside authors whose programs were downloaded from the public TI-89 archives.
+A backup of a TI-89 Titanium graphing calculator, taken on 27 January 2009, merged with the
+earlier exports that survived. It holds the Marist High School math team's accumulated
+program set: 133 calculator variables in this repository, plus three submodules, written
+between 1998 and 2008 by eleven students and eight outside authors whose programs were
+downloaded from the public TI-89 archives.
+
+The 2009 session accounts for 101 of them. The rest come from earlier exports, chiefly one
+dated 16 April 2007, and six of those are the earlier home of a program the 2009 backup holds
+under a different folder. Those six are committed as renames, so the history tracks a program
+across the reorganisation rather than listing it twice. See [Moves](#moves).
 
 **Most of this code is not mine.** I joined the math team in 2006 and inherited the program
 set from the programmers before me. Where a file records who wrote it, that person is the
@@ -25,13 +31,25 @@ incomplete without them.
 | `MAIN/` | the keyboard programs, menus and maintenance tools |
 | `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual |
 | `MAIN/StudyCards/` | StudyCards stacks for Latin and Western Civilization |
+| `MATH/` | NoteFolio documents left in the `math` folder, which predates the split into subjects |
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `RANDOM/` | submodule |
 | `tools/` | `.89p` diff driver, so programs show as source |
 
-Filenames are `<calculator folder>.<variable name>.<extension>`: `chem.density.89p` is the
-variable `density` in the calculator folder `chem`, called as `chem\density()`.
+**Every directory is the calculator folder its files record at offset `0x0A`**, so a path
+never implies a call that does not exist. `MAIN/NoteFolio/` and `MAIN/StudyCards/` are the
+exception: both hold `MAIN` variables and are split by document type instead.
+
+Filenames are as the PC link software wrote them. For a program that means
+`<calculator folder>.<variable name>.<extension>`: `chem.density.89p` is the variable
+`density` in the calculator folder `chem`, called as `chem\density()`.
+
+A `.89y` works differently. NoteFolio and StudyCards derive an eight-character variable name
+by running the folder and the title together and truncating, so `MAIN/NoteFolio/math.sine.89y`
+holds `MAIN\mathsine` and `MAIN/StudyCards/main.westcivm.89y` holds `MAIN\mainwest`. Those
+names are not unique, five Latin stacks all being `MAIN\mainlati`, so the filename carries the
+only usable identity and is left alone.
 
 | Extension | Type |
 |---|---|
@@ -61,6 +79,58 @@ python3 tools/ti89-textconv.py MAIN/main.kbdprgm3.89p
 Text-stored programs print as TI-BASIC. Programs that were run on the calculator before the
 backup were tokenized into byte-code and print as a hex dump. GitHub's web interface ignores
 textconv and still shows these files as binary.
+
+## Moves
+
+Programs were reorganised twice. The `.tig` dumps that preceded this backup show everything in
+one `math` folder, then split into `miscam` and `miscnz` during 2007, then landing in
+`discrete` and `history` by 2009. Six programs are in the repository under both their old and
+their new folder, and the 2009 session exported other variables from `miscam` and `miscnz`
+without these, so the originals were gone from the calculator by then. They are committed as
+renames:
+
+| From | To | What changed with the move |
+|---|---|---|
+| `miscnz\weekdays` | `history\weekdays` | rewritten: a retry loop, input validation and the week of the year |
+| `miscam\baseconv` | `discrete\baseconv` | one space, in a `Local` declaration |
+| `miscam\binomial` | `discrete\binomial` | blank lines, and a trailing space on a `Dialog` title |
+| `miscam\fib` | `discrete\fib` | nothing, byte for byte |
+| `miscnz\pasc` | `discrete\pascalst` | nothing but the variable name |
+| `miscam\inqsolve` | `miscam\inqslve2` | one line: `part(equ,1)` becomes `part(u[1,1])` |
+
+Where the content changed, the move and the change are separate commits. Git decides a rename
+by hashing chunks of a file, and shifting a single byte re-chunks everything after it: folded
+together, `miscam\baseconv` to `discrete\baseconv` scores 0 and the rename is lost. Moved on
+its own it scores 97. So the move commit carries the old body under the new folder, and the
+edit follows as an ordinary diff:
+
+```
+git log --follow -p HISTORY/history.weekdays.89p
+```
+
+`discrete\binary` went the other way. It survives in four versions, all archived and all
+exported in the same second, so only the code orders them: features accumulate, commented-out
+`Disp` and `Pause` lines peak at 60 in the third while the octal and hexadecimal paths were
+being made to work, and the fourth finally clears in `DelVar` the labels its own `Toolbar`
+declares. They are committed onto one path as four successive revisions. The three earlier
+versions have the variable name at `0x40` rewritten from `binary0N` to `binary` so that the
+path and the container agree and every commit holds a file the calculator would accept. That
+field is fixed width and sits below `0x56`, so no length or checksum changes, and it is the
+only place in the repository where a byte differs from the export. `HEAD` is the export
+untouched throughout.
+
+### Calls that were already broken
+
+`main\mathem2` was only partly updated when the folders changed. It calls `discrete\baseconv`,
+`discrete\binomial` and `discrete\pascalst`, but still calls `miscam\fib`, `miscnz\weekdays`
+and `miscam\inqsolve`, none of which the 2009 calculator still had. Those three menu entries
+failed at export time, alongside `math\sss`, `math\sas`, `math\simu`, `math\tran`, `math\hype`
+and `math\inter`, which are in no dump here at all. They are left as they are: they are
+evidence about programs that no longer exist.
+
+`main\mtprogsd` and `main\clrvs` list almost every program in the set but call none of them,
+one being a transfer list and the other a `DelVar` list. Both still use pre-2008 names, so
+being named by them is not evidence that a program was reachable.
 
 ## The `.89p` file format
 
@@ -92,6 +162,12 @@ regardless.
 
 This means a program Randall Lewis wrote in 1998 is dated 1998, even though it did not leave
 the calculator until 2007.
+
+A move is a repository event rather than an authorship one, so it is dated to the
+reorganisation and not to the program. `miscam\baseconv` is Jesse Lai's, 1999; the commit that
+moves it to `discrete\baseconv` is dated 2008 and authored to Patrick Seiter, whom
+`main\mathem2`'s credits screen and the programmer's manual credit with reorganising the set.
+No file records who moved what, so every move commit says which evidence dates it.
 
 ## Contributors
 
