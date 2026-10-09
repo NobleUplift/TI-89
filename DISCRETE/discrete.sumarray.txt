@@ -1,0 +1,16 @@
+(r)
+Func
+Local c,cur,i
+SortA r
+{1}→c
+r[1]→cur
+For i,2,dim(r)
+If r[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+r[i]→cur
+EndIf
+EndFor
+Return c
+EndFunc

@@ -4,31 +4,47 @@ Notes for this folder's programs that go beyond what belongs in an in-program co
 repository root `CLAUDE.md` for why: comments cost real parse time on the calculator, so they're
 kept short in the `.89p` source and the detail lives here instead.
 
-## `discrete\entinfo` and `discrete\entropy`
+## `discrete\entinfo`, `discrete\entropy` and `discrete\sumarray`
 
 `discrete\entinfo` is a UI harness over Shannon entropy and information-gain: `H(S) = -Σ
-p·log2(p)`. It contains no entropy math itself — every path (F1 Manual, F1 Automatic, F2
-Manual's per-child and parent, F2 Automatic's per-child and parent) calls `discrete\entropy(c)`
-to actually compute H from a counts list, instead of duplicating that computation inline at each
-call site. `entropy` takes one list of counts (not raw labels — callers tally first) and
-returns `{h, n}`: entropy in bits and the total count, which is exactly the pair I.G.'s weighting
-(`Σ (n(child)/N)·H(child)`) needs from each child without recomputing anything.
+p·log2(p)`. It contains no entropy or tallying math itself — two Functions do that, and every
+path in `entinfo` (F1 Manual, F1 Automatic, F2 Manual's per-child and parent, F2 Automatic's
+per-child and parent) composes them instead of duplicating either computation inline:
 
-**`discrete\entropy` is a `.89f` Function (type `0x13`), not a `.89p` Program**, since only a
-Function can be called inside an expression and hand back a value — a Program called as
-`name()` is always a void statement. This is the first `.89f` file in this repository, so
-`tools/ti89-pack.py` was extended to support packing one (previously `.89p`-only, type `0x12`
-hard-coded). **The exact tail bytes a text-stored Function needs have not been confirmed**: every
-file this format was reverse-engineered against is a Program, and this repo has no other `.89f`
-sample to check against. `tools/ti89-textconv.py`'s own comment says a Program and a Function's
-text-stored body ends in the same `... E5 00 01 <flag> <tag>` suffix, which is some evidence the
-tail is shared — but the 2 bytes before that suffix are documented elsewhere as specifically "the
-`Prgm` command," and whether `Func` needs a different 2 bytes there is unconfirmed. `ti89-pack.py`
-currently assumes the tail is identical for both. **If `discrete\entropy.89f` fails to transfer
-or won't run after sending it to a calculator, this assumption is the first thing to revisit** —
-the fallback is typing `discrete.entropy.txt`'s source into the calculator's own Program Editor
-(choose New > Function there) instead of sending the packed file, since the calculator's own
-editor tokenizes correctly regardless of this repo's guess.
+- `discrete\entropy(c)` takes one list of **counts** (not raw labels) and returns `{h, n}`:
+  entropy in bits and the total count, which is exactly the pair I.G.'s weighting
+  (`Σ (n(child)/N)·H(child)`) needs from each child without recomputing anything. Also used to
+  compute F1's "Max (uniform)" display, via `entropy(newList(dim(p))+1)` — a uniform list of
+  `dim(p)` ones — since Shannon entropy of a uniform distribution over k classes is exactly
+  `log2(k)`; this also means the `dim(p)=1` case needs no special-casing, since `entropy()` on a
+  length-1 uniform list already returns 0 on its own.
+- `discrete\sumarray(r)` takes one list of **raw per-sample labels** and returns a counts list:
+  sorts a local copy of `r` (the caller's own list is never touched — Func parameters are
+  copies) and counts each run of equal values. This is the tally step every "Automatic" mode and
+  every I.G. child/parent needs before `entropy()` can run on it.
+
+Composed together, `entropy(sumarray(rawLabels))` goes straight from raw per-sample data to H,
+e.g. `discrete\entropy(discrete\sumarray({1,1,2,2,2,3,3,4}))` → 1.9056 bits. Because `sumarray`
+sorts its own copy, `Lbl auto`'s parent-entropy call (`entropy(sumarray(y))`) needs no separate
+copy of `y` either, unlike the hand-written tally loop it replaced, which needed an explicit
+`y→yp` first precisely because `SortA` sorts in place.
+
+**Both `discrete\entropy` and `discrete\sumarray` are `.89f` Functions (type `0x13`), not `.89p`
+Programs**, since only a Function can be called inside an expression and hand back a value — a
+Program called as `name()` is always a void statement. `discrete\entropy` was the first `.89f`
+file in this repository, so `tools/ti89-pack.py` was extended to support packing one (previously
+`.89p`-only, type `0x12` hard-coded). **The exact tail bytes a text-stored Function needs have
+not been confirmed**: every file this format was reverse-engineered against is a Program, and
+this repo had no `.89f` sample to check against before these two. `tools/ti89-textconv.py`'s own
+comment says a Program and a Function's text-stored body ends in the same
+`... E5 00 01 <flag> <tag>` suffix, which is some evidence the tail is shared — but the 2 bytes
+before that suffix are documented elsewhere as specifically "the `Prgm` command," and whether
+`Func` needs a different 2 bytes there is unconfirmed. `ti89-pack.py` currently assumes the tail
+is identical for both. **If either `.89f` fails to transfer or won't run after sending it to a
+calculator, this assumption is the first thing to revisit** — the fallback is typing that file's
+`.txt` source into the calculator's own Program Editor (choose New > Function there) instead of
+sending the packed file, since the calculator's own editor tokenizes correctly regardless of
+this repo's guess.
 
 ### Toolbar (`discrete\entinfo`)
 
