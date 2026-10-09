@@ -1,0 +1,199 @@
+()
+Prgm
+© entinfo: harness for Shannon entropy & information gain UI.
+© F1 Entropy, F2 I.G., F3 About/Quit -- see DISCRETE/README.md.
+© The actual entropy math lives in discrete\entropy(counts),
+© called from every path here instead of being duplicated.
+Local p,r,c,n,i,m,cur,cur2,res,res2,mx,k,j,all,sumnh,wtd,y,yp,child
+
+Lbl top
+ClrIO
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
+Toolbar
+Title "Entropy"
+Item "Manual",ask
+Item "Automatic",tally
+Title "I.G."
+Item "Manual",gain
+Item "Automatic",auto
+Title "About"
+Item "About",about
+Item "Quit",quit
+EndTBar
+Goto top
+
+Lbl ask
+Input "Counts, e.g. {16,14}",p
+Goto calc
+
+Lbl tally
+Input "Labels or db[col]",r
+If dim(r)<1
+Goto top
+SortA r
+{1}→c
+r[1]→cur
+For i,2,dim(r)
+If r[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+r[i]→cur
+EndIf
+EndFor
+c→p
+
+Lbl calc
+If dim(p)<1 or min(p)<0
+Goto top
+sum(p)→n
+If n≤0
+Goto top
+entropy(p)→res
+
+If dim(p)>1
+ln(dim(p))/ln(2)→mx
+If dim(p)=1
+0→mx
+
+ClrIO
+Disp "H(S) = "&string(round(res[1],4))&" bits"
+If mx>0
+Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*res[1]/mx,2))&"%"
+Pause
+Goto top
+
+Lbl gain
+Input "Number of children",k
+If k<2
+Goto top
+{}→all
+0→sumnh
+For j,1,k
+ClrIO
+Disp "Child "&string(j)&" of "&string(k)
+Input "Labels or db[col]",r
+If dim(r)<1
+Goto top
+augment(all,r)→all
+SortA r
+{1}→c
+r[1]→cur
+For i,2,dim(r)
+If r[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+r[i]→cur
+EndIf
+EndFor
+entropy(c)→res
+sumnh+res[2]*res[1]→sumnh
+EndFor
+
+SortA all
+{1}→c
+all[1]→cur
+For i,2,dim(all)
+If all[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+all[i]→cur
+EndIf
+EndFor
+entropy(c)→res
+sumnh/res[2]→wtd
+
+ClrIO
+Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
+Pause
+Goto top
+
+Lbl auto
+Input "Attribute col, e.g. db[1]",r
+Input "Class col, e.g. db[2]",y
+If dim(r)<1 or dim(r)≠dim(y)
+Goto top
+
+© parent entropy: tally a sorted copy of y, so y itself
+© stays row-aligned with r for the grouping pass below
+y→yp
+SortA yp
+{1}→c
+yp[1]→cur
+For i,2,dim(yp)
+If yp[i]=cur Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+yp[i]→cur
+EndIf
+EndFor
+entropy(c)→res
+
+© group rows into children by attribute value: sorting
+© r,y together keeps each class label attached to its
+© own row's attribute value
+SortA r,y
+{y[1]}→child
+r[1]→cur
+0→sumnh
+For i,2,dim(r)
+If r[i]=cur Then
+augment(child,{y[i]})→child
+Else
+SortA child
+{1}→c
+child[1]→cur2
+For m,2,dim(child)
+If child[m]=cur2 Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+child[m]→cur2
+EndIf
+EndFor
+entropy(c)→res2
+sumnh+res2[2]*res2[1]→sumnh
+{y[i]}→child
+r[i]→cur
+EndIf
+EndFor
+
+© finalize the last (trailing) child
+SortA child
+{1}→c
+child[1]→cur2
+For m,2,dim(child)
+If child[m]=cur2 Then
+c[dim(c)]+1→c[dim(c)]
+Else
+augment(c,{1})→c
+child[m]→cur2
+EndIf
+EndFor
+entropy(c)→res2
+sumnh+res2[2]*res2[1]→sumnh
+
+sumnh/dim(y)→wtd
+
+ClrIO
+Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
+Pause
+Goto top
+
+Lbl about
+Dialog
+Title "Shannon Entropy"
+Text "Entropy & information gain"
+Text "for the TI-89"
+Text "By Patrick Seiter and"
+Text "Claude (Anthropic), 2026"
+EndDlog
+Goto top
+
+Lbl quit
+ClrIO
+DispHome
+EndPrgm

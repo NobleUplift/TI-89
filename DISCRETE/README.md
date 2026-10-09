@@ -4,33 +4,33 @@ Notes for this folder's programs that go beyond what belongs in an in-program co
 repository root `CLAUDE.md` for why: comments cost real parse time on the calculator, so they're
 kept short in the `.89p` source and the detail lives here instead.
 
-## `discrete\entropy` and `discrete\shannonh`
+## `discrete\entinfo` and `discrete\entropy`
 
-`discrete\entropy` is a UI harness over Shannon entropy and information-gain: `H(S) = -Σ
+`discrete\entinfo` is a UI harness over Shannon entropy and information-gain: `H(S) = -Σ
 p·log2(p)`. It contains no entropy math itself — every path (F1 Manual, F1 Automatic, F2
-Manual's per-child and parent, F2 Automatic's per-child and parent) calls `discrete\shannonh(c)`
+Manual's per-child and parent, F2 Automatic's per-child and parent) calls `discrete\entropy(c)`
 to actually compute H from a counts list, instead of duplicating that computation inline at each
-call site. `shannonh` takes one list of counts (not raw labels — callers tally first) and
+call site. `entropy` takes one list of counts (not raw labels — callers tally first) and
 returns `{h, n}`: entropy in bits and the total count, which is exactly the pair I.G.'s weighting
 (`Σ (n(child)/N)·H(child)`) needs from each child without recomputing anything.
 
-**`shannonh` is a `.89f` Function (type `0x13`), not a `.89p` Program**, since only a Function
-can be called inside an expression and hand back a value — a Program called as `name()` is
-always a void statement. This is the first `.89f` file in this repository, so `tools/
-ti89-pack.py` was extended to support packing one (previously `.89p`-only, type `0x12`
+**`discrete\entropy` is a `.89f` Function (type `0x13`), not a `.89p` Program**, since only a
+Function can be called inside an expression and hand back a value — a Program called as
+`name()` is always a void statement. This is the first `.89f` file in this repository, so
+`tools/ti89-pack.py` was extended to support packing one (previously `.89p`-only, type `0x12`
 hard-coded). **The exact tail bytes a text-stored Function needs have not been confirmed**: every
-file this format was reverse-engineered against is a Program, and this repo has no `.89f` sample
-to check against. `tools/ti89-textconv.py`'s own comment says a Program and a Function's
+file this format was reverse-engineered against is a Program, and this repo has no other `.89f`
+sample to check against. `tools/ti89-textconv.py`'s own comment says a Program and a Function's
 text-stored body ends in the same `... E5 00 01 <flag> <tag>` suffix, which is some evidence the
 tail is shared — but the 2 bytes before that suffix are documented elsewhere as specifically "the
 `Prgm` command," and whether `Func` needs a different 2 bytes there is unconfirmed. `ti89-pack.py`
-currently assumes the tail is identical for both. **If `discrete\shannonh.89f` fails to transfer
+currently assumes the tail is identical for both. **If `discrete\entropy.89f` fails to transfer
 or won't run after sending it to a calculator, this assumption is the first thing to revisit** —
-the fallback is typing `discrete.shannonh.txt`'s source into the calculator's own Program Editor
+the fallback is typing `discrete.entropy.txt`'s source into the calculator's own Program Editor
 (choose New > Function there) instead of sending the packed file, since the calculator's own
 editor tokenizes correctly regardless of this repo's guess.
 
-### Toolbar
+### Toolbar (`discrete\entinfo`)
 
 Every top-level `Title` opens an `Item` dropdown; none act directly. This matches
 `main\kbdprgm3`'s own "Mathematics" `Title`, which nests a single `Item` ("Main Program")
