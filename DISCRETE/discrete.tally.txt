@@ -1,18 +1,24 @@
 (r)
 Func
-© c: counts being built, returned
-© cur: value of the current run
+© v: distinct values seen so far
+© c: matching counts, returned
 © i: loop index over r
-Local c,cur,i
-SortA r
-{1}→c
-r[1]→cur
-For i,2,dim(r)
-If r[i]=cur Then
-c[dim(c)]+1→c[dim(c)]
-Else
+© j: loop index over v
+© found: 1 if r[i] matched an existing v
+Local v,c,i,j,found
+{}→v
+{}→c
+For i,1,dim(r)
+0→found
+For j,1,dim(v)
+If r[i]=v[j] Then
+c[j]+1→c[j]
+1→found
+EndIf
+EndFor
+If found=0 Then
+augment(v,{r[i]})→v
 augment(c,{1})→c
-r[i]→cur
 EndIf
 EndFor
 Return c

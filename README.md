@@ -163,6 +163,13 @@ rediscovered later.
   converts a single list to a column-matrix but takes only one list at a time; for a Data
   variable with several columns, the brace form above is the one-shot way to get them all into
   a single Matrix.
+- **`SortA`/`SortD` cannot be used inside a Function (`Func...EndFunc`) or any expression.**
+  Confirmed on hardware: `"SortA is invalid in a function or current expression"`. They're
+  commands with an in-place side effect, not expression functions, and a Function body is
+  restricted to `Return`, assignments, `For`/`If`/`While`, and non-mutating functions like
+  `augment()` — nothing that mutates a variable as a statement in its own right. To tally/sort
+  inside a Function, use a linear-search-and-accumulate approach instead (see
+  `DISCRETE/discrete.tally.txt` for a worked example), or move the sort into a calling Program.
 
 ## Dates
 

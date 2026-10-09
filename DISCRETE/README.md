@@ -18,16 +18,26 @@ per-child and parent) composes them instead of duplicating either computation in
   `dim(p)` ones — since Shannon entropy of a uniform distribution over k classes is exactly
   `log2(k)`; this also means the `dim(p)=1` case needs no special-casing, since `entropy()` on a
   length-1 uniform list already returns 0 on its own.
-- `discrete\tally(r)` takes one list of **raw per-sample labels** and returns a counts list:
-  sorts a local copy of `r` (the caller's own list is never touched — Func parameters are
-  copies) and counts each run of equal values. This is the tally step every "Automatic" mode and
-  every I.G. child/parent needs before `entropy()` can run on it.
+- `discrete\tally(r)` takes one list of **raw per-sample labels** and returns a counts list: for
+  each element of `r`, it linearly searches a running list of distinct values seen so far,
+  bumping that value's count if found or adding it fresh otherwise. No sorting involved — see
+  below for why. This is the tally step every "Automatic" mode and every I.G. child/parent needs
+  before `entropy()` can run on it.
 
 Composed together, `entropy(tally(rawLabels))` goes straight from raw per-sample data to H, e.g.
-`discrete\entropy(discrete\tally({1,1,2,2,2,3,3,4}))` → 1.9056 bits. Because `tally` sorts its
-own copy, `Lbl auto`'s parent-entropy call (`entropy(tally(y))`) needs no separate copy of `y`
-either, unlike the hand-written tally loop it replaced, which needed an explicit `y→yp` first
-precisely because `SortA` sorts in place.
+`discrete\entropy(discrete\tally({1,1,2,2,2,3,3,4}))` → 1.9056 bits. `tally` only ever reads
+`r`, never mutates it, so `Lbl auto`'s parent-entropy call (`entropy(tally(y))`) needs no
+separate copy of `y` either, unlike the hand-written tally loop it replaced, which needed an
+explicit `y→yp` first precisely because `SortA` sorts in place.
+
+**`SortA` cannot be used inside a Function.** `tally`'s first implementation sorted its input
+(same approach as the hand-written loops it replaced) and failed on real hardware with "SortA
+is invalid in a function or current expression." `SortA` is a command with an in-place side
+effect, not an expression function, and a `Func` body is restricted to expression-style
+operations (`Return`, assignments, `For`/`If`, and non-mutating functions like `augment()`) —
+nothing that mutates a variable as a statement in its own right. The fix was the
+linear-search-and-accumulate algorithm above, which never needs to sort anything. Recorded in
+the repository root `README.md`'s TI-BASIC notes too, since it isn't specific to this program.
 
 **The name `tally` is reused two ways in `entinfo` itself**: `Lbl tally` (F1's Automatic entry
 point, jumped to by a `Toolbar` `Item`) and the `discrete\tally` Function are different things

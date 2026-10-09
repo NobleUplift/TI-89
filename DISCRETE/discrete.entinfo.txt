@@ -82,8 +82,8 @@ If dim(r)<1 or dim(r)≠dim(y)
 Goto top
 
 © parent entropy from the whole class column; tally(y)
-© sorts its own copy, so y itself stays row-aligned with r
-© for the grouping pass below
+© only reads y, so it stays row-aligned with r for the
+© grouping pass below
 entropy(tally(y))→res
 
 © group rows into children by attribute value: sorting
