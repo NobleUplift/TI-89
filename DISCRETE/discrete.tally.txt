@@ -1,5 +1,8 @@
 (r)
 Func
+© c: counts being built, returned
+© cur: value of the current run
+© i: loop index over r
 Local c,cur,i
 SortA r
 {1}→c
