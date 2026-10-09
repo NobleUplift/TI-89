@@ -3,7 +3,7 @@ Prgm
 © entinfo: harness for Shannon entropy & information gain UI.
 © F1 Entropy, F2 I.G., F3 About/Quit -- see DISCRETE/README.md.
 © The actual math lives in discrete\entropy(counts) and
-© discrete\sumarray(rawLabels), called from every path here
+© discrete\tally(rawLabels), called from every path here
 © instead of being duplicated.
 Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child
 
@@ -31,7 +31,7 @@ Lbl tally
 Input "Labels or db[col]",r
 If dim(r)<1
 Goto top
-sumarray(r)→p
+tally(r)→p
 
 Lbl calc
 If dim(p)<1 or min(p)<0
@@ -63,11 +63,11 @@ Input "Labels or db[col]",r
 If dim(r)<1
 Goto top
 augment(all,r)→all
-entropy(sumarray(r))→res
+entropy(tally(r))→res
 sumnh+res[2]*res[1]→sumnh
 EndFor
 
-entropy(sumarray(all))→res
+entropy(tally(all))→res
 sumnh/res[2]→wtd
 
 ClrIO
@@ -81,10 +81,10 @@ Input "Class col, e.g. db[2]",y
 If dim(r)<1 or dim(r)≠dim(y)
 Goto top
 
-© parent entropy from the whole class column; sumarray(y)
+© parent entropy from the whole class column; tally(y)
 © sorts its own copy, so y itself stays row-aligned with r
 © for the grouping pass below
-entropy(sumarray(y))→res
+entropy(tally(y))→res
 
 © group rows into children by attribute value: sorting
 © r,y together keeps each class label attached to its
@@ -97,7 +97,7 @@ For i,2,dim(r)
 If r[i]=cur Then
 augment(child,{y[i]})→child
 Else
-entropy(sumarray(child))→res2
+entropy(tally(child))→res2
 sumnh+res2[2]*res2[1]→sumnh
 {y[i]}→child
 r[i]→cur
@@ -105,7 +105,7 @@ EndIf
 EndFor
 
 © finalize the last (trailing) child
-entropy(sumarray(child))→res2
+entropy(tally(child))→res2
 sumnh+res2[2]*res2[1]→sumnh
 
 sumnh/dim(y)→wtd

@@ -4,7 +4,7 @@ Notes for this folder's programs that go beyond what belongs in an in-program co
 repository root `CLAUDE.md` for why: comments cost real parse time on the calculator, so they're
 kept short in the `.89p` source and the detail lives here instead.
 
-## `discrete\entinfo`, `discrete\entropy` and `discrete\sumarray`
+## `discrete\entinfo`, `discrete\entropy` and `discrete\tally`
 
 `discrete\entinfo` is a UI harness over Shannon entropy and information-gain: `H(S) = -Σ
 p·log2(p)`. It contains no entropy or tallying math itself — two Functions do that, and every
@@ -18,18 +18,27 @@ per-child and parent) composes them instead of duplicating either computation in
   `dim(p)` ones — since Shannon entropy of a uniform distribution over k classes is exactly
   `log2(k)`; this also means the `dim(p)=1` case needs no special-casing, since `entropy()` on a
   length-1 uniform list already returns 0 on its own.
-- `discrete\sumarray(r)` takes one list of **raw per-sample labels** and returns a counts list:
+- `discrete\tally(r)` takes one list of **raw per-sample labels** and returns a counts list:
   sorts a local copy of `r` (the caller's own list is never touched — Func parameters are
   copies) and counts each run of equal values. This is the tally step every "Automatic" mode and
   every I.G. child/parent needs before `entropy()` can run on it.
 
-Composed together, `entropy(sumarray(rawLabels))` goes straight from raw per-sample data to H,
-e.g. `discrete\entropy(discrete\sumarray({1,1,2,2,2,3,3,4}))` → 1.9056 bits. Because `sumarray`
-sorts its own copy, `Lbl auto`'s parent-entropy call (`entropy(sumarray(y))`) needs no separate
-copy of `y` either, unlike the hand-written tally loop it replaced, which needed an explicit
-`y→yp` first precisely because `SortA` sorts in place.
+Composed together, `entropy(tally(rawLabels))` goes straight from raw per-sample data to H, e.g.
+`discrete\entropy(discrete\tally({1,1,2,2,2,3,3,4}))` → 1.9056 bits. Because `tally` sorts its
+own copy, `Lbl auto`'s parent-entropy call (`entropy(tally(y))`) needs no separate copy of `y`
+either, unlike the hand-written tally loop it replaced, which needed an explicit `y→yp` first
+precisely because `SortA` sorts in place.
 
-**Both `discrete\entropy` and `discrete\sumarray` are `.89f` Functions (type `0x13`), not `.89p`
+**The name `tally` is reused two ways in `entinfo` itself**: `Lbl tally` (F1's Automatic entry
+point, jumped to by a `Toolbar` `Item`) and the `discrete\tally` Function are different things
+sharing one word, including inside `Lbl tally` itself, where the line is
+`tally(r)→p` — a function call, from within the identically-named label. This works correctly
+(labels are only ever resolved after `Goto`/`Item`/`Title`; `tally(x)` with parentheses in an
+expression always resolves to the Function; they're different namespaces), but it reads
+ambiguously at a glance, so it's called out here rather than left for a future reader to puzzle
+over.
+
+**Both `discrete\entropy` and `discrete\tally` are `.89f` Functions (type `0x13`), not `.89p`
 Programs**, since only a Function can be called inside an expression and hand back a value — a
 Program called as `name()` is always a void statement. `discrete\entropy` was the first `.89f`
 file in this repository, so `tools/ti89-pack.py` was extended to support packing one (previously
