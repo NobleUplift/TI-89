@@ -50,11 +50,8 @@ sum(p)→n
 If n≤0
 Goto top
 entropy(p)→res
-
-If dim(p)>1
-ln(dim(p))/ln(2)→mx
-If dim(p)=1
-0→mx
+entropy(newList(dim(p))+1)→res2
+res2[1]→mx
 
 ClrIO
 Disp "H(S) = "&string(round(res[1],4))&" bits"
