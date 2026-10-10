@@ -17,21 +17,32 @@ per-child and parent) composes them instead of duplicating either computation in
 - `discrete\entropy(c)` takes one list of **counts** (not raw labels) and returns `{h, n}`:
   entropy in bits and the total count, which is exactly the pair I.G.'s weighting
   (`Σ (n(child)/N)·H(child)`) needs from each child without recomputing anything. Also used to
-  compute F1's "Max (uniform)" display, via `entropy(newList(dim(p))+1)` — a uniform list of
-  `dim(p)` ones — since Shannon entropy of a uniform distribution over k classes is exactly
-  `log2(k)`; this also means the `dim(p)=1` case needs no special-casing, since `entropy()` on a
-  length-1 uniform list already returns 0 on its own.
+  compute F1's "Max (uniform)" display, via `discrete\entropy(newList(dim(p))+1)` — a uniform
+  list of `dim(p)` ones — since Shannon entropy of a uniform distribution over k classes is
+  exactly `log2(k)`; this also means the `dim(p)=1` case needs no special-casing, since
+  `discrete\entropy()` on a length-1 uniform list already returns 0 on its own.
 - `discrete\tally(r)` takes one list of **raw per-sample labels** and returns a counts list: for
   each element of `r`, it linearly searches a running list of distinct values seen so far,
   bumping that value's count if found or adding it fresh otherwise. No sorting involved — see
   below for why. This is the tally step every "Automatic" mode and every I.G. child/parent needs
-  before `entropy()` can run on it.
+  before `discrete\entropy()` can run on it.
 
-Composed together, `entropy(tally(rawLabels))` goes straight from raw per-sample data to H, e.g.
-`discrete\entropy(discrete\tally({1,1,2,2,2,3,3,4}))` → 1.9056 bits. `tally` only ever reads
-`r`, never mutates it, so `Lbl auto`'s parent-entropy call (`entropy(tally(y))`) needs no
-separate copy of `y` either, unlike the hand-written tally loop it replaced, which needed an
-explicit `y→yp` first precisely because `SortA` sorts in place.
+Composed together, `discrete\entropy(discrete\tally(rawLabels))` goes straight from raw
+per-sample data to H, e.g. `discrete\entropy(discrete\tally({1,1,2,2,2,3,3,4}))` → 1.9056 bits.
+`tally` only ever reads `r`, never mutates it, so `Lbl auto`'s parent-entropy call
+(`discrete\entropy(discrete\tally(y))`) needs no separate copy of `y` either, unlike the
+hand-written tally loop it replaced, which needed an explicit `y→yp` first precisely because
+`SortA` sorts in place.
+
+**Every call from `entinfo` into `entropy`/`tally` must be folder-qualified
+(`discrete\entropy(...)`, `discrete\tally(...)`), never bare.** A bare `entropy(...)` only
+resolves if `discrete` happens to be the calculator's *currently active* folder — the TI-89
+resolves an unqualified name against the current folder, not against the folder the calling
+program itself lives in. When `discrete` isn't current, the CAS doesn't error on the undefined
+name; it silently keeps the call symbolic and carries that unevaluated expression through `res`,
+`wtd`, and so on, so `round()` and `string()` end up displaying the literal expression text (e.g.
+"Parent H = round(entropy(...),4) bits") instead of a number — confirmed on real hardware. Every
+call site in `entinfo.txt` is qualified for exactly this reason; don't add a new one unqualified.
 
 **`SortA` cannot be used inside a Function.** `tally`'s first implementation sorted its input
 (same approach as the hand-written loops it replaced) and failed on real hardware with "SortA

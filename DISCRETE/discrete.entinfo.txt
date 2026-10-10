@@ -44,7 +44,7 @@ Lbl tally
 Input "Labels {1,1,2} or db[col]",r
 If dim(r)<1
  Goto top
-tally(r)→p
+discrete\tally(r)→p
 
 Lbl calc
 If dim(p)<1 or min(p)<0
@@ -52,8 +52,8 @@ If dim(p)<1 or min(p)<0
 sum(p)→n
 If n≤0
  Goto top
-entropy(p)→res
-entropy(newList(dim(p))+1)→res2
+discrete\entropy(p)→res
+discrete\entropy(newList(dim(p))+1)→res2
 res2[1]→mx
 
 ClrIO
@@ -76,11 +76,11 @@ For j,1,k
  If dim(r)<1
   Goto top
  augment(all,r)→all
- entropy(tally(r))→res
+ discrete\entropy(discrete\tally(r))→res
  sumnh+res[2]*res[1]→sumnh
 EndFor
 
-entropy(tally(all))→res
+discrete\entropy(discrete\tally(all))→res
 sumnh/res[2]→wtd
 Goto showgain
 
@@ -91,7 +91,7 @@ If dim(r)<1 or dim(r)≠dim(y)
  Goto top
 
 © parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
-entropy(tally(y))→res
+discrete\entropy(discrete\tally(y))→res
 
 © group rows into children by attribute value: sorting r,y together keeps each class label attached to its own row's attribute value
 SortA r,y
@@ -102,7 +102,7 @@ For i,2,dim(r)
  If r[i]=cur Then
   augment(child,{y[i]})→child
  Else
-  entropy(tally(child))→res2
+  discrete\entropy(discrete\tally(child))→res2
   sumnh+res2[2]*res2[1]→sumnh
   {y[i]}→child
   r[i]→cur
@@ -110,7 +110,7 @@ For i,2,dim(r)
 EndFor
 
 © finalize the last (trailing) child
-entropy(tally(child))→res2
+discrete\entropy(discrete\tally(child))→res2
 sumnh+res2[2]*res2[1]→sumnh
 
 sumnh/dim(y)→wtd
