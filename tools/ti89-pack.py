@@ -31,6 +31,14 @@ across every variable on the device, so it isn't free the way parse time
 is. Only *leading* whitespace is touched; a space inside a quoted string
 starts after other characters on its line, so centered Text/Disp strings
 (e.g. discrete\\baseconv's About screen) are untouched.
+
+Whole-line comments (a line starting with © once leading spaces are
+stripped) are dropped entirely, for the same reason: they document the
+.txt source for human readers and cost real bytes on the calculator for
+no runtime benefit. Only a line whose first non-space character is ©
+qualifies -- every comment in this repo is written that way (its own
+line, never trailing after a command), so this never touches a © that
+might appear inside a quoted string.
 """
 import sys
 
@@ -56,7 +64,8 @@ def pad(s, n):
 
 def pack(source, folder, name, vtype, comment="Program file"):
     text = source.replace("\r\n", "\n").rstrip("\n")
-    text = "\n".join(line.lstrip(" ") for line in text.split("\n"))
+    lines = (line.lstrip(" ") for line in text.split("\n"))
+    text = "\n".join(line for line in lines if not line.startswith("©"))
     body = ti89charset.encode(text) + TEXT_PRGM_TAIL
     data = len(body).to_bytes(2, "big") + body
     checksum = (sum(data) & 0xFFFF).to_bytes(2, "little")

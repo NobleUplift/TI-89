@@ -1,8 +1,11 @@
 # DISCRETE
 
-Notes for this folder's programs that go beyond what belongs in an in-program comment. See the
-repository root `CLAUDE.md` for why: comments cost real parse time on the calculator, so they're
-kept short in the `.89p` source and the detail lives here instead.
+Notes for this folder's programs that go beyond what belongs in an in-program comment. In-program
+comments here stay short, succinct blurbs rather than full explanations, so the `.txt` source
+reads easily without becoming its own essay; the detail lives here instead. (`©` comments never
+reach the calculator at all — see "Indentation and comments are for `.txt` readability only"
+below — but the root `CLAUDE.md` rule to keep comments short predates that fix and still shapes
+how these are written.)
 
 ## `discrete\entinfo`, `discrete\entropy` and `discrete\tally`
 
@@ -91,22 +94,25 @@ dropdown — documented in that program's own Info screen as a lesson learned.
     while extracting a column back out of a genuine Matrix type is not.
 - **F3 About**: *About* (credits) / *Quit*.
 
-### Indentation is for `.txt` readability only, never shipped to the calculator
+### Indentation and comments are for `.txt` readability only, never shipped to the calculator
 
 The `.txt` sources in this folder indent nested blocks one space per level (`For`/`EndFor`,
 `If...Then`/`EndIf`, `Toolbar`/`EndTBar`, `Dialog`/`EndDlog` at the same column, contents one
-space deeper) purely so a human reviewing the source can see the nesting. **`tools/ti89-pack.py`
-strips every line's leading spaces before encoding**, so the `.89p`/`.89f` files sent to a
-calculator are never larger for it.
+space deeper) and carry `©` comments (a one-line purpose blurb for every `Local` variable, plus
+a few lines explaining non-obvious steps) purely so a human reviewing the source can follow it.
+**`tools/ti89-pack.py` strips every line's leading spaces, and drops every whole-line `©`
+comment, before encoding**, so the `.89p`/`.89f` files sent to a calculator are never larger for
+either.
 
-This matters because the two costs of extra whitespace are not the same size. Parse time is
-negligible — a space is one byte skipped once, at tokenization, not re-paid per loop iteration
-— but storage is a real, measured cost: before stripping, indentation added 48 bytes to
-`discrete.entinfo.89p` (2559→2607, ~1.9%), 3 to `discrete.entropy.89f`, and 19 to
-`discrete.tally.89f`. Small for three files, but RAM/Flash on the calculator is one finite pool
-shared across *every* program on it — the same reason `CLAUDE.md` says to keep in-program
-comments short. Stripping on pack is what lets the `.txt` stay readable without that cost
-actually reaching the device.
+This matters because the costs are not the same size for a human reader and for the device.
+Parse time is negligible — a space or a comment line is skipped once, at tokenization, not
+re-paid per loop iteration — but storage is a real, measured cost, and comments are the bigger
+of the two: stripping leading spaces alone saved 48 bytes on `discrete.entinfo.89p`, 3 on
+`discrete.entropy.89f`, 19 on `discrete.tally.89f`; stripping the `©` comment lines on top of
+that saved a further 1178, 118, and 151 bytes respectively (down to 1983, 218, and 310 bytes).
+RAM/Flash on the calculator is one finite pool shared across *every* program on it — the same
+reason `CLAUDE.md` says to keep in-program comments short — but stripping on pack means the
+`.txt` source doesn't have to choose between that limit and being readable.
 
 ### Implementation notes
 
