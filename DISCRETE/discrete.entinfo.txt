@@ -11,15 +11,15 @@ Lbl top
 ClrIO
 Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
 Toolbar
-Title "Entropy"
-Item "Manual",ask
-Item "Automatic",tally
-Title "I.G."
-Item "Manual",gain
-Item "Automatic",auto
-Title "About"
-Item "About",about
-Item "Quit",quit
+ Title "Entropy"
+ Item "Manual",ask
+ Item "Automatic",tally
+ Title "I.G."
+ Item "Manual",gain
+ Item "Automatic",auto
+ Title "About"
+ Item "About",about
+ Item "Quit",quit
 EndTBar
 Goto top
 
@@ -30,15 +30,15 @@ Goto calc
 Lbl tally
 Input "Labels or db[col]",r
 If dim(r)<1
-Goto top
+ Goto top
 tally(r)→p
 
 Lbl calc
 If dim(p)<1 or min(p)<0
-Goto top
+ Goto top
 sum(p)→n
 If n≤0
-Goto top
+ Goto top
 entropy(p)→res
 entropy(newList(dim(p))+1)→res2
 res2[1]→mx
@@ -46,25 +46,25 @@ res2[1]→mx
 ClrIO
 Disp "H(S) = "&string(round(res[1],4))&" bits"
 If mx>0
-Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*res[1]/mx,2))&"%"
+ Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*res[1]/mx,2))&"%"
 Pause
 Goto top
 
 Lbl gain
 Input "Number of children",k
 If k<2
-Goto top
+ Goto top
 {}→all
 0→sumnh
 For j,1,k
-ClrIO
-Disp "Child "&string(j)&" of "&string(k)
-Input "Labels or db[col]",r
-If dim(r)<1
-Goto top
-augment(all,r)→all
-entropy(tally(r))→res
-sumnh+res[2]*res[1]→sumnh
+ ClrIO
+ Disp "Child "&string(j)&" of "&string(k)
+ Input "Labels or db[col]",r
+ If dim(r)<1
+  Goto top
+ augment(all,r)→all
+ entropy(tally(r))→res
+ sumnh+res[2]*res[1]→sumnh
 EndFor
 
 entropy(tally(all))→res
@@ -75,7 +75,7 @@ Lbl auto
 Input "Attribute col, e.g. db[1]",r
 Input "Class col, e.g. db[2]",y
 If dim(r)<1 or dim(r)≠dim(y)
-Goto top
+ Goto top
 
 © parent entropy from the whole class column; tally(y)
 © only reads y, so it stays row-aligned with r for the
@@ -90,14 +90,14 @@ SortA r,y
 r[1]→cur
 0→sumnh
 For i,2,dim(r)
-If r[i]=cur Then
-augment(child,{y[i]})→child
-Else
-entropy(tally(child))→res2
-sumnh+res2[2]*res2[1]→sumnh
-{y[i]}→child
-r[i]→cur
-EndIf
+ If r[i]=cur Then
+  augment(child,{y[i]})→child
+ Else
+  entropy(tally(child))→res2
+  sumnh+res2[2]*res2[1]→sumnh
+  {y[i]}→child
+  r[i]→cur
+ EndIf
 EndFor
 
 © finalize the last (trailing) child
@@ -114,11 +114,11 @@ Goto top
 
 Lbl about
 Dialog
-Title "Shannon Entropy"
-Text "Entropy & information gain"
-Text "for the TI-89"
-Text "By Patrick Seiter and"
-Text "Claude (Anthropic), 2026"
+ Title "Shannon Entropy"
+ Text "Entropy & information gain"
+ Text "for the TI-89"
+ Text "By Patrick Seiter and"
+ Text "Claude (Anthropic), 2026"
 EndDlog
 Goto top
 

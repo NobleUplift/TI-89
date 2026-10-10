@@ -9,8 +9,8 @@ sum(c)→n
 c/n→p
 0→h
 For i,1,dim(p)
-If p[i]>0
-h-p[i]*ln(p[i])/ln(2)→h
+ If p[i]>0
+  h-p[i]*ln(p[i])/ln(2)→h
 EndFor
 Return {h,n}
 EndFunc

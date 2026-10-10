@@ -9,17 +9,17 @@ Local v,c,i,j,found
 {}→v
 {}→c
 For i,1,dim(r)
-0→found
-For j,1,dim(v)
-If r[i]=v[j] Then
-c[j]+1→c[j]
-1→found
-EndIf
-EndFor
-If found=0 Then
-augment(v,{r[i]})→v
-augment(c,{1})→c
-EndIf
+ 0→found
+ For j,1,dim(v)
+  If r[i]=v[j] Then
+   c[j]+1→c[j]
+   1→found
+  EndIf
+ EndFor
+ If found=0 Then
+  augment(v,{r[i]})→v
+  augment(c,{1})→c
+ EndIf
 EndFor
 Return c
 EndFunc
