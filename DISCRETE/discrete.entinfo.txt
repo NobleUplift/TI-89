@@ -41,7 +41,7 @@ Input "Counts, e.g. {16,14}",p
 Goto calc
 
 Lbl tally
-Input "Labels or db[col]",r
+Input "Labels {1,1,2} or db[col]",r
 If dim(r)<1
  Goto top
 tally(r)→p
@@ -72,7 +72,7 @@ If k<2
 For j,1,k
  ClrIO
  Disp "Child "&string(j)&" of "&string(k)
- Input "Labels or db[col]",r
+ Input "Labels {1,1,2} or db[col]",r
  If dim(r)<1
   Goto top
  augment(all,r)→all
