@@ -23,6 +23,14 @@ script assumes the tail is identical for both types. If a packed .89f
 fails to transfer or run, that assumption is the first thing to revisit;
 the fallback is typing the source into the calculator's own Program
 Editor (New > Function) instead of sending this file.
+
+Leading spaces on each line are stripped before encoding: indentation in
+the .txt source is for human readability only and is never shipped to the
+calculator -- every space costs a byte in a shared, finite storage pool
+across every variable on the device, so it isn't free the way parse time
+is. Only *leading* whitespace is touched; a space inside a quoted string
+starts after other characters on its line, so centered Text/Disp strings
+(e.g. discrete\\baseconv's About screen) are untouched.
 """
 import sys
 
@@ -48,6 +56,7 @@ def pad(s, n):
 
 def pack(source, folder, name, vtype, comment="Program file"):
     text = source.replace("\r\n", "\n").rstrip("\n")
+    text = "\n".join(line.lstrip(" ") for line in text.split("\n"))
     body = ti89charset.encode(text) + TEXT_PRGM_TAIL
     data = len(body).to_bytes(2, "big") + body
     checksum = (sum(data) & 0xFFFF).to_bytes(2, "little")
