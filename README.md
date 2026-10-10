@@ -35,7 +35,7 @@ incomplete without them.
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `RANDOM/` | submodule |
-| `tools/` | `.89p` diff driver, so programs show as source; `studycards.py` generates `.89y` StudyCards stacks |
+| `tools/` | `.89p` diff driver, so programs show as source |
 
 **Every directory is the calculator folder its files record at offset `0x0A`**, so a path
 never implies a call that does not exist. `MAIN/NoteFolio/` and `MAIN/StudyCards/` are the
