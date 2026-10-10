@@ -29,13 +29,13 @@ incomplete without them.
 |---|---|
 | `ALGEBRA/` … `TRIGONOM/` | calculator programs, grouped by subject |
 | `MAIN/` | the keyboard programs, menus and maintenance tools |
-| `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual |
+| `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual; `tools/notefolio.py` reads and builds them |
 | `MAIN/StudyCards/` | StudyCards stacks for Latin and Western Civilization |
 | `MATH/` | NoteFolio documents left in the `math` folder, which predates the split into subjects |
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `RANDOM/` | submodule |
-| `tools/` | `.89p` diff driver, so programs show as source; `notefolio.py` builds and dumps `.89y` NoteFolio documents |
+| `tools/` | `.89p` diff driver, so programs show as source |
 
 **Every directory is the calculator folder its files record at offset `0x0A`**, so a path
 never implies a call that does not exist. `MAIN/NoteFolio/` and `MAIN/StudyCards/` are the
