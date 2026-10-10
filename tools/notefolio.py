@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""Build and extract TI NoteFolio documents (*.89y, *.9xy, *.v2y).
+"""Build, dump and check TI NoteFolio documents (*.89y, *.9xy, *.v2y).
 
-    python3 tools/notefolio.py extract FILE.89y [-o OUT.txt] [--info]
-    python3 tools/notefolio.py build IN.txt -o FILE.89y [--name VAR] [--folder main]
-                                     [--calc ti89|ti92p|v200] [--comment TEXT]
-                                     [--archived]
+    notefolio.py build  notes.txt [-o out.89y]   text source -> .89y
+    notefolio.py dump   file.89y [-o out.txt]    .89y -> the same text source
+    notefolio.py verify file.89y ...             parse + rebuild, compare bytes
+
+`extract` is accepted as another name for `dump`. `build` takes --name,
+--folder, --calc ti89|ti92p|v200, --comment and --archived; `dump --info`
+prints the header fields to stderr.
 
 In the text form, notes are separated by a line holding only a form feed
 (U+000C), and lines end in LF. Text is converted with ti89charset, so the
 calculator's Greek letters, arrows and math symbols round-trip as Unicode.
 
-NoteFolio format, reverse engineered from the documents in this repository.
+The layout below was reverse-engineered from the documents in MAIN/NoteFolio/
+and MATH/ (no public document for the NoteFolio format could be found), so it
+is verified only against those files. `verify` rebuilds each one byte for byte.
+
 A NoteFolio document is an ordinary single-variable TI-89 file (see the
 header layout in ti89-textconv.py) holding one variable of type 0x1C, the
 "other" type that Flash apps use for their documents. Offsets below are into
@@ -35,7 +41,9 @@ is whatever NoteFolio picked, up to 8 characters. StudyCards stacks use the
 same 0x1C container with the type string "STDY".
 """
 import argparse
+import datetime
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -101,8 +109,16 @@ def parse(data):
     return header, notes
 
 
-def build(notes, name, folder="main", calc="ti89", comment="", archived=False):
+def default_comment(when=None):
+    """The comment TI Connect writes, e.g. "AppVariable file 01/27/09, 00:04"."""
+    when = when or datetime.datetime.now()
+    return when.strftime("AppVariable file %m/%d/%y, %H:%M")
+
+
+def build(notes, name, folder="MAIN", calc="ti89", comment=None, archived=False):
     """Return the bytes of a NoteFolio file holding the given raw notes."""
+    if comment is None:
+        comment = default_comment()
     for i, note in enumerate(notes):
         if b"\0" in note:
             raise ValueError("note %d contains a NUL byte" % (i + 1))
@@ -143,7 +159,7 @@ def notes_to_text(notes):
     return sep.join(ti89charset.decode(note) for note in notes) + "\n"
 
 
-def cmd_extract(args):
+def cmd_dump(args):
     header, notes = parse(open(args.file, "rb").read())
     out = open(args.output, "w", encoding="utf-8", newline="\n") \
         if args.output else sys.stdout
@@ -157,39 +173,69 @@ def cmd_build(args):
     text = open(args.file, encoding="utf-8").read()
     name = args.name
     if name is None:
-        stem = os.path.basename(args.output).split(".")[-2]
-        name = stem.lower()[:8]
+        stem = os.path.splitext(os.path.basename(args.output or args.file))[0]
+        name = re.sub(r"\W", "", stem.split(".")[-1]).lower()[:8]
     if not name or len(name) > 8:
         raise SystemExit("variable name must be 1 to 8 characters: %r" % name)
-    data = build(text_to_notes(text), name, args.folder, args.calc,
-                 args.comment, args.archived)
-    open(args.output, "wb").write(data)
+    notes = text_to_notes(text)
+    out = args.output or "%s.%s.89y" % (args.folder.lower(), name)
+    open(out, "wb").write(build(notes, name, args.folder, args.calc,
+                                args.comment, args.archived))
+    print("wrote %s: %d notes, variable %s\\%s"
+          % (out, len(notes), args.folder, name))
+
+
+def cmd_verify(args):
+    """Rebuild each file from its parsed text and header; 1 if any differ."""
+    calcs = {sig: calc for calc, sig in SIGNATURES.items()}
+    bad = 0
+    for f in args.files:
+        raw = open(f, "rb").read()
+        try:
+            header, notes = parse(raw)
+            text = notes_to_text(notes)
+            ok = build(text_to_notes(text), header["name"], header["folder"],
+                       calcs[raw[:8]], header["comment"],
+                       bool(header["attribute"])) == raw
+        except ValueError as e:
+            ok = False
+            sys.stderr.write("%s: %s\n" % (f, e))
+        print("%-6s %s" % ("ok" if ok else "DIFF", f))
+        bad += not ok
+    return 1 if bad else 0
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p = sub.add_parser("extract", help="print a NoteFolio document as text")
+    p = sub.add_parser("build", help="make a NoteFolio document from text")
+    p.add_argument("file", help="UTF-8 text; a form-feed line breaks notes")
+    p.add_argument("-o", "--output",
+                   help="default: <folder>.<name>.89y in the current directory")
+    p.add_argument("-n", "--name",
+                   help="variable name, max 8 chars (default: file name)")
+    p.add_argument("--folder", default="MAIN")
+    p.add_argument("--calc", choices=sorted(SIGNATURES), default="ti89")
+    p.add_argument("--comment", help='default: "AppVariable file <now>"')
+    p.add_argument("--archived", action="store_true")
+    p.set_defaults(func=cmd_build)
+
+    p = sub.add_parser("dump", aliases=["extract"],
+                       help="print a NoteFolio document as text")
     p.add_argument("file")
     p.add_argument("-o", "--output", help="write to this file, not stdout")
     p.add_argument("--info", action="store_true",
                    help="print the header fields to stderr")
-    p.set_defaults(func=cmd_extract)
+    p.set_defaults(func=cmd_dump)
 
-    p = sub.add_parser("build", help="make a NoteFolio document from text")
-    p.add_argument("file", help="UTF-8 text; a form-feed line breaks notes")
-    p.add_argument("-o", "--output", required=True)
-    p.add_argument("--name", help="variable name (default: from OUTPUT)")
-    p.add_argument("--folder", default="main")
-    p.add_argument("--calc", choices=sorted(SIGNATURES), default="ti89")
-    p.add_argument("--comment", default="")
-    p.add_argument("--archived", action="store_true")
-    p.set_defaults(func=cmd_build)
+    p = sub.add_parser("verify", help="check that files rebuild byte for byte")
+    p.add_argument("files", nargs="+")
+    p.set_defaults(func=cmd_verify)
 
     args = parser.parse_args()
     try:
-        args.func(args)
+        sys.exit(args.func(args) or 0)
     except ValueError as e:
         raise SystemExit("%s: %s" % (args.file, e))
 

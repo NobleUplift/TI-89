@@ -35,7 +35,7 @@ incomplete without them.
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `RANDOM/` | submodule |
-| `tools/` | `.89p` diff driver, so programs show as source; NoteFolio text extractor and builder |
+| `tools/` | `.89p` diff driver, so programs show as source; `notefolio.py` builds and dumps `.89y` NoteFolio documents |
 
 **Every directory is the calculator folder its files record at offset `0x0A`**, so a path
 never implies a call that does not exist. `MAIN/NoteFolio/` and `MAIN/StudyCards/` are the
@@ -82,11 +82,13 @@ textconv and still shows these files as binary.
 
 NoteFolio documents are plain text in an app-variable wrapper. `tools/notefolio.py` prints one
 as UTF-8 text, with a form-feed line between notes, and builds a `.89y` from text in the same
-form. Its docstring records the file layout.
+form, and `verify` checks that a document rebuilds byte for byte. Its docstring records the file
+layout.
 
 ```
-python3 tools/notefolio.py extract MAIN/NoteFolio/main.manual.89y -o manual.txt
-python3 tools/notefolio.py build manual.txt -o main.manual.89y --name manual --folder main
+python3 tools/notefolio.py dump MAIN/NoteFolio/main.manual.89y -o manual.txt
+python3 tools/notefolio.py build manual.txt          # writes main.manual.89y
+python3 tools/notefolio.py verify MAIN/NoteFolio/*.89y MATH/*.89y
 ```
 
 ## Moves
