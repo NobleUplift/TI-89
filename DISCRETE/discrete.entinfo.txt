@@ -69,11 +69,7 @@ EndFor
 
 entropy(tally(all))→res
 sumnh/res[2]→wtd
-
-ClrIO
-Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
-Pause
-Goto top
+Goto showgain
 
 Lbl auto
 Input "Attribute col, e.g. db[1]",r
@@ -110,6 +106,7 @@ sumnh+res2[2]*res2[1]→sumnh
 
 sumnh/dim(y)→wtd
 
+Lbl showgain
 ClrIO
 Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
 Pause
