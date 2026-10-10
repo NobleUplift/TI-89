@@ -5,6 +5,21 @@ Prgm
 © The actual math lives in discrete\entropy(counts) and
 © discrete\tally(rawLabels), called from every path here
 © instead of being duplicated.
+© p: counts/probabilities fed to entropy()
+© r: raw labels, or an attribute column in auto
+© n: total count, sum(p)
+© i: loop index, auto's grouping pass
+© cur: attribute value of the current group
+© res: parent/manual entropy result {h,n}
+© res2: child or uniform-max entropy result {h,n}
+© mx: max (uniform) entropy, for efficiency %
+© k: number of children, gain's manual entry
+© j: loop index over children
+© all: pooled labels from every child
+© sumnh: running Σ n(child)*H(child)
+© wtd: weighted average child entropy
+© y: class labels, auto's second column
+© child: current child's labels, auto
 Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child
 
 Lbl top
