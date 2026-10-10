@@ -29,7 +29,7 @@ incomplete without them.
 |---|---|
 | `ALGEBRA/` … `TRIGONOM/` | calculator programs, grouped by subject |
 | `MAIN/` | the keyboard programs, menus and maintenance tools |
-| `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual |
+| `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual; `tools/notefolio.py` reads and builds them |
 | `MAIN/StudyCards/` | StudyCards stacks for Latin and Western Civilization |
 | `MATH/` | NoteFolio documents left in the `math` folder, which predates the split into subjects |
 | `PERIODIC/` | submodule: periodic table browser |
@@ -79,6 +79,23 @@ python3 tools/ti89-textconv.py MAIN/main.kbdprgm3.89p
 Text-stored programs print as TI-BASIC. Programs that were run on the calculator before the
 backup were tokenized into byte-code and print as a hex dump. GitHub's web interface ignores
 textconv and still shows these files as binary.
+
+NoteFolio documents are plain text in an app-variable wrapper. `tools/notefolio.py` prints one
+as UTF-8 text, with a form-feed line between notes, and builds a `.89y` from text in the same
+form, and `verify` checks that a document rebuilds byte for byte. Its docstring records the file
+layout.
+
+```
+python3 tools/notefolio.py dump MAIN/NoteFolio/main.manual.89y -o manual.txt
+python3 tools/notefolio.py build manual.txt          # writes main.manual.89y
+python3 tools/notefolio.py verify MAIN/NoteFolio/*.89y MATH/*.89y
+```
+
+No published specification of the NoteFolio format turned up, so the layout was worked out from
+the documents here. The only other third-party NoteFolio tool found is
+["TI-89 Titanium Notefolio to TI-83 Plus ASM"](https://www.ticalc.org/archives/files/fileinfo/405/40545.html)
+(ticalc.org file 40545), which converts NoteFolio documents to TI-83 Plus assembly programs and
+ships with its source.
 
 ## Moves
 
