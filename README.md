@@ -91,6 +91,12 @@ python3 tools/notefolio.py build manual.txt          # writes main.manual.89y
 python3 tools/notefolio.py verify MAIN/NoteFolio/*.89y MATH/*.89y
 ```
 
+No published specification of the NoteFolio format turned up, so the layout was worked out from
+the documents here. The only other third-party NoteFolio tool found is
+["TI-89 Titanium Notefolio to TI-83 Plus ASM"](https://www.ticalc.org/archives/files/fileinfo/405/40545.html)
+(ticalc.org file 40545), which converts NoteFolio documents to TI-83 Plus assembly programs and
+ships with its source.
+
 ## Moves
 
 Programs were reorganised twice. The `.tig` dumps that preceded this backup show everything in
