@@ -35,7 +35,7 @@ incomplete without them.
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `RANDOM/` | submodule |
-| `tools/` | `.89p` diff driver, so programs show as source |
+| `tools/` | `.89p` diff driver, so programs show as source; NoteFolio text extractor and builder |
 
 **Every directory is the calculator folder its files record at offset `0x0A`**, so a path
 never implies a call that does not exist. `MAIN/NoteFolio/` and `MAIN/StudyCards/` are the
@@ -79,6 +79,15 @@ python3 tools/ti89-textconv.py MAIN/main.kbdprgm3.89p
 Text-stored programs print as TI-BASIC. Programs that were run on the calculator before the
 backup were tokenized into byte-code and print as a hex dump. GitHub's web interface ignores
 textconv and still shows these files as binary.
+
+NoteFolio documents are plain text in an app-variable wrapper. `tools/notefolio.py` prints one
+as UTF-8 text, with a form-feed line between notes, and builds a `.89y` from text in the same
+form. Its docstring records the file layout.
+
+```
+python3 tools/notefolio.py extract MAIN/NoteFolio/main.manual.89y -o manual.txt
+python3 tools/notefolio.py build manual.txt -o main.manual.89y --name manual --folder main
+```
 
 ## Moves
 
