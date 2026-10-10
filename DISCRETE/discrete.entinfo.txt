@@ -1,0 +1,137 @@
+()
+Prgm
+© entinfo: harness for Shannon entropy & information gain UI.
+© F1 Entropy, F2 I.G., F3 About/Quit -- see DISCRETE/README.md.
+© The actual math lives in discrete\entropy(counts) and discrete\tally(rawLabels), called from every path here instead of being duplicated.
+© p: counts/probabilities fed to entropy()
+© r: raw labels, or an attribute column in auto
+© n: total count, sum(p)
+© i: loop index, auto's grouping pass
+© cur: attribute value of the current group
+© res: parent/manual entropy result {h,n}
+© res2: child or uniform-max entropy result {h,n}
+© mx: max (uniform) entropy, for efficiency %
+© k: number of children, gain's manual entry
+© j: loop index over children
+© all: pooled labels from every child
+© sumnh: running Σ n(child)*H(child)
+© wtd: weighted average child entropy
+© y: class labels, auto's second column
+© child: current child's labels, auto
+Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child
+
+Lbl top
+ClrIO
+Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
+Toolbar
+ Title "Entropy"
+  Item "Manual",ask
+  Item "Automatic",tally
+ Title "I.G."
+  Item "Manual",gain
+  Item "Automatic",auto
+ Title "About"
+  Item "About",about
+  Item "Quit",quit
+EndTBar
+Goto top
+
+Lbl ask
+Input "Counts, e.g. {16,14}",p
+Goto calc
+
+Lbl tally
+Input "Labels {1,1,2} or db[col]",r
+If dim(r)<1
+ Goto top
+discrete\tally(r)→p
+
+Lbl calc
+If dim(p)<1 or min(p)<0
+ Goto top
+sum(p)→n
+If n≤0
+ Goto top
+discrete\entropy(p)→res
+discrete\entropy(newList(dim(p))+1)→res2
+res2[1]→mx
+
+ClrIO
+Disp "H(S) = "&string(round(res[1],4))&" bits"
+If mx>0
+ Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*res[1]/mx,2))&"%"
+Pause
+Goto top
+
+Lbl gain
+Input "Number of children",k
+If k<2
+ Goto top
+{}→all
+0→sumnh
+For j,1,k
+ ClrIO
+ Disp "Child "&string(j)&" of "&string(k)
+ Input "Labels {1,1,2} or db[col]",r
+ If dim(r)<1
+  Goto top
+ augment(all,r)→all
+ discrete\entropy(discrete\tally(r))→res
+ sumnh+res[2]*res[1]→sumnh
+EndFor
+
+discrete\entropy(discrete\tally(all))→res
+sumnh/res[2]→wtd
+Goto showgain
+
+Lbl auto
+Input "Attribute col, e.g. db[1]",r
+Input "Class col, e.g. db[2]",y
+If dim(r)<1 or dim(r)≠dim(y)
+ Goto top
+
+© parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
+discrete\entropy(discrete\tally(y))→res
+
+© group rows into children by attribute value: sorting r,y together keeps each class label attached to its own row's attribute value
+SortA r,y
+{y[1]}→child
+r[1]→cur
+0→sumnh
+For i,2,dim(r)
+ If r[i]=cur Then
+  augment(child,{y[i]})→child
+ Else
+  discrete\entropy(discrete\tally(child))→res2
+  sumnh+res2[2]*res2[1]→sumnh
+  {y[i]}→child
+  r[i]→cur
+ EndIf
+EndFor
+
+© finalize the last (trailing) child
+discrete\entropy(discrete\tally(child))→res2
+sumnh+res2[2]*res2[1]→sumnh
+
+sumnh/dim(y)→wtd
+
+Lbl showgain
+ClrIO
+Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
+Pause
+Goto top
+
+Lbl about
+Dialog
+ Title "Shannon Entropy"
+ Text "Entropy & information gain"
+ Text "for the TI-89"
+ Text "By Patrick Seiter and"
+ Text "Claude (Anthropic), 2026"
+EndDlog
+Goto top
+
+Lbl quit
+ClrIO
+DispHome
+EndPrgm
