@@ -114,6 +114,23 @@ RAM/Flash on the calculator is one finite pool shared across *every* program on 
 reason `CLAUDE.md` says to keep in-program comments short — but stripping on pack means the
 `.txt` source doesn't have to choose between that limit and being readable.
 
+**Write one long comment line, not several short `©` lines pre-wrapped to fit.** A long line
+wraps for display on its own once it passes roughly 25 characters, the same whether it's one
+logical comment or several `©`-prefixed ones hand-broken to that width — so hand-wrapping buys
+nothing visually and costs more lines for the same words. For example, don't write:
+
+```
+© parent entropy from the whole class column; tally(y)
+© only reads y, so it stays row-aligned with r for the
+© grouping pass below
+```
+
+when one line reads exactly the same once wrapped, and is one `©` and one line instead of three:
+
+```
+© parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
+```
+
 ### Implementation notes
 
 - Uses `Input`, not `Request`, for list entry: `Request`'s dialog starts in Alpha-Lock (meant for

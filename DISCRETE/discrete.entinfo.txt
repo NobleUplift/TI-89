@@ -2,9 +2,7 @@
 Prgm
 © entinfo: harness for Shannon entropy & information gain UI.
 © F1 Entropy, F2 I.G., F3 About/Quit -- see DISCRETE/README.md.
-© The actual math lives in discrete\entropy(counts) and
-© discrete\tally(rawLabels), called from every path here
-© instead of being duplicated.
+© The actual math lives in discrete\entropy(counts) and discrete\tally(rawLabels), called from every path here instead of being duplicated.
 © p: counts/probabilities fed to entropy()
 © r: raw labels, or an attribute column in auto
 © n: total count, sum(p)
@@ -92,14 +90,10 @@ Input "Class col, e.g. db[2]",y
 If dim(r)<1 or dim(r)≠dim(y)
  Goto top
 
-© parent entropy from the whole class column; tally(y)
-© only reads y, so it stays row-aligned with r for the
-© grouping pass below
+© parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
 entropy(tally(y))→res
 
-© group rows into children by attribute value: sorting
-© r,y together keeps each class label attached to its
-© own row's attribute value
+© group rows into children by attribute value: sorting r,y together keeps each class label attached to its own row's attribute value
 SortA r,y
 {y[1]}→child
 r[1]→cur
