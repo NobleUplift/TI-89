@@ -131,6 +131,13 @@ when one line reads exactly the same once wrapped, and is one `©` and one line 
 © parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
 ```
 
+This doesn't apply to the per-variable blurbs above `Local` (e.g. `© p: counts/probabilities fed
+to entropy()`, `© r: raw labels, or an attribute column in auto`, one per line) — those are
+already independent, already-short items, one per `Local` variable, not one explanation
+artificially broken across several `©` lines. Keep each of those on its own line; only
+consolidate a comment that's wrapping a single thought across lines it didn't need to be split
+over.
+
 ### Implementation notes
 
 - Uses `Input`, not `Request`, for list entry: `Request`'s dialog starts in Alpha-Lock (meant for
