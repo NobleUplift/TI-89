@@ -12,14 +12,14 @@ ClrIO
 Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
 Toolbar
  Title "Entropy"
- Item "Manual",ask
- Item "Automatic",tally
+  Item "Manual",ask
+  Item "Automatic",tally
  Title "I.G."
- Item "Manual",gain
- Item "Automatic",auto
+  Item "Manual",gain
+  Item "Automatic",auto
  Title "About"
- Item "About",about
- Item "Quit",quit
+  Item "About",about
+  Item "Quit",quit
 EndTBar
 Goto top
 
