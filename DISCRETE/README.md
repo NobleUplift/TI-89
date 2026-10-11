@@ -157,11 +157,24 @@ over.
   is typing the braces yourself.
 - `Lbl quit` runs `ClrIO` then `DispHome` so quitting returns to the Home screen instead of
   leaving the calculator on the Program I/O screen.
+- **`entinfo` owns the I/O screen and never blind-clears or `Pause`s.** `ClrIO` runs exactly once,
+  right before `Lbl top`, to clear whatever ran before `entinfo` — not inside `Lbl top` itself,
+  which would just re-print the same static header every time a toolbar command returns to the
+  menu. From there, every path prints its own result (or error) and goes straight back to the
+  toolbar with no `Pause`: `Lbl calc`, the per-subset prompt in `Lbl gain`'s loop, and
+  `Lbl showgain` each `ClrIO` immediately before printing, since they're replacing a specific
+  prior screen with a new one of possibly different length — that's a real, functional clear, not
+  the redundant kind removed from `Lbl top`. An error message, by contrast, prints in place (no
+  `ClrIO`) directly below whatever prompt produced it, so the context of what was being entered
+  stays visible; it clears on the next successful result.
 - Every point where `entinfo` reads a value it's about to hand to `discrete\entropy` or
-  `discrete\tally` (`p`, and every `r`/`y`) checks `getType(...)≠"LIST"` first and shows a plain
-  "Data type error" message with a corrected example instead of letting the crash surface from
-  inside the Function on an unrelated line number — e.g. a bare `16` typed where `{16}` was
+  `discrete\tally` (`p`, and every `r`/`y`) checks `getType(...)≠"LIST"` first and shows a short
+  one-line `"Err: ..."` message with a corrected example instead of letting the crash surface
+  from inside the Function on an unrelated line number — e.g. a bare `16` typed where `{16}` was
   needed previously surfaced as `discrete\entropy`'s own "Data type" error on an unrelated line.
+  Kept to one `Disp` per error deliberately: unlike the leading-whitespace/comment stripping
+  above, error text *is* shipped to the calculator as real runtime strings, so every line is a
+  real, unavoidable storage cost.
 - **Forces Approximate mode for the whole run, restored on quit.** `entinfo` saves the
   calculator's current Exact/Approx setting into `em` via `getMode("Exact/Approx")`, calls
   `setMode("Exact/Approx","Approximate")` once before `Lbl top`, and restores it with

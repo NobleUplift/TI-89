@@ -9,15 +9,15 @@ Prgm
 © i: loop index, auto's grouping pass
 © cur: attribute value of the current group
 © res: parent/manual entropy result {h,n}
-© res2: child or uniform-max entropy result {h,n}
+© res2: subset or uniform-max entropy result {h,n}
 © mx: max (uniform) entropy, for efficiency %
-© k: number of children, gain's manual entry
-© j: loop index over children
-© all: pooled labels from every child
-© sumnh: running Σ n(child)*H(child)
-© wtd: weighted average child entropy
+© k: number of subsets, gain's manual entry
+© j: loop index over subsets
+© all: pooled labels from every subset
+© sumnh: running Σ n(subset)*H(subset)
+© wtd: weighted average subset entropy
 © y: class labels, auto's second column
-© child: current child's labels, auto
+© child: current subset's labels, auto
 © em: caller's Exact/Approx mode, restored on quit
 Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em
 
@@ -27,12 +27,17 @@ Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em
 getMode("Exact/Approx")→em
 setMode("Exact/Approx","Approximate")
 
-Lbl top
+© ClrIO once, to clear whatever ran before us. From here on entinfo
+© owns the I/O screen and never blind-clears it again -- each path
+© below only clears/prints exactly what it needs to, and no path
+© Pauses: it prints its result (or error) and returns to the toolbar.
 ClrIO
 Disp "Shannon Entropy: "
 Disp "H(S) = -Σ p·log2(p)"
 Disp "Information Gain: "
 Disp "Gain = H(S) - Σ(n/N)·H(child)"
+
+Lbl top
 Toolbar
  Title "Entropy"
   Item "Manual",ask
@@ -53,11 +58,7 @@ Goto calc
 Lbl tally
 Input "Labels {1,1,2} or db[col]",r
 If getType(r)≠"LIST" Then
- ClrIO
- Disp "Data type error"
- Disp "Labels must be a list,"
- Disp "e.g. {1,1,2}, or db[col]"
- Pause
+ Disp "Err: need {1,1,2}/db[col]"
  Goto top
 EndIf
 If dim(r)<1
@@ -66,11 +67,7 @@ discrete\tally(r)→p
 
 Lbl calc
 If getType(p)≠"LIST" Then
- ClrIO
- Disp "Data type error"
- Disp "Counts must be a list,"
- Disp "e.g. {16,14}"
- Pause
+ Disp "Err: need {16,14}"
  Goto top
 EndIf
 If dim(p)<1 or min(p)<0
@@ -86,7 +83,6 @@ ClrIO
 Disp "H(S) = "&string(round(res[1],4))&" bits"
 If mx>0
  Disp "Max (uniform) = "&string(round(mx,4))&" bits","Efficiency = "&string(round(100*res[1]/mx,2))&"%"
-Pause
 Goto top
 
 Lbl gain
@@ -97,14 +93,10 @@ If k<2
 0→sumnh
 For j,1,k
  ClrIO
- Disp "Child "&string(j)&" of "&string(k)
+ Disp "Subset "&string(j)&" of "&string(k)
  Input "Labels {1,1,2} or db[col]",r
  If getType(r)≠"LIST" Then
-  ClrIO
-  Disp "Data type error"
-  Disp "Labels must be a list,"
-  Disp "e.g. {1,1,2}, or db[col]"
-  Pause
+  Disp "Err: need {1,1,2}/db[col]"
   Goto top
  EndIf
  If dim(r)<1
@@ -122,19 +114,11 @@ Lbl auto
 Input "Attribute col, e.g. db[1]",r
 Input "Class col, e.g. db[2]",y
 If getType(r)≠"LIST" Then
- ClrIO
- Disp "Data type error"
- Disp "Attribute must be"
- Disp "db[col] or a list"
- Pause
+ Disp "Err: attrib needs list/db[col]"
  Goto top
 EndIf
 If getType(y)≠"LIST" Then
- ClrIO
- Disp "Data type error"
- Disp "Class must be"
- Disp "db[col] or a list"
- Pause
+ Disp "Err: class needs list/db[col]"
  Goto top
 EndIf
 If dim(r)<1 or dim(r)≠dim(y)
@@ -143,7 +127,7 @@ If dim(r)<1 or dim(r)≠dim(y)
 © parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
 discrete\entropy(discrete\tally(y))→res
 
-© group rows into children by attribute value: sorting r,y together keeps each class label attached to its own row's attribute value
+© group rows into subsets by attribute value: sorting r,y together keeps each class label attached to its own row's attribute value
 SortA r,y
 {y[1]}→child
 r[1]→cur
@@ -153,9 +137,7 @@ For i,2,dim(r)
   augment(child,{y[i]})→child
  Else
   If dim(child)<1 Then
-   ClrIO
-   Disp "Empty child at i="&string(i)
-   Pause
+   Disp "Err: empty subset at i="&string(i)
    Goto top
   EndIf
   discrete\entropy(discrete\tally(child))→res2
@@ -165,11 +147,9 @@ For i,2,dim(r)
  EndIf
 EndFor
 
-© finalize the last (trailing) child
+© finalize the last (trailing) subset
 If dim(child)<1 Then
- ClrIO
- Disp "Empty child at end"
- Pause
+ Disp "Err: empty subset at end"
  Goto top
 EndIf
 discrete\entropy(discrete\tally(child))→res2
@@ -182,7 +162,6 @@ ClrIO
 Disp "Parent H = "&string(round(res[1],4))&" bits"
 Disp "Wtd H    = "&string(round(wtd,4))&" bits"
 Disp "Gain     = "&string(round(res[1]-wtd,4))&" bits"
-Pause
 Goto top
 
 Lbl about
