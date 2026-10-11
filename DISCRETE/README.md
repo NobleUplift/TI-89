@@ -44,6 +44,17 @@ name; it silently keeps the call symbolic and carries that unevaluated expressio
 "Parent H = round(entropy(...),4) bits") instead of a number — confirmed on real hardware. Every
 call site in `entinfo.txt` is qualified for exactly this reason; don't add a new one unqualified.
 
+**A bare call *nested inside* another call surfaces differently: as a "Domain error", not literal
+symbolic text.** `discrete\entropy(tally(child))` (bare `tally`, qualified `entropy`) fails this
+way: `tally(child)` stays symbolic as above, but instead of that symbolic expression reaching a
+`Disp`/`string()`/`round()` where it'd just print as text, it's passed straight into `entropy`'s
+own `sum(c)→n` as `c` — and `sum()` of a symbolic, non-list expression is where the Domain error
+actually fires, confirmed on real hardware. **So "Domain error" inside `discrete\entropy` doesn't
+only mean a genuinely empty or malformed list reached it (see the empty-subset guards above) — it
+can also mean one of the names in the call that produced its argument isn't folder-qualified.**
+Check every `discrete\` prefix in the expression first, same as for the literal-symbolic-text
+case.
+
 **`SortA` cannot be used inside a Function.** `tally`'s first implementation sorted its input
 (same approach as the hand-written loops it replaced) and failed on real hardware with "SortA
 is invalid in a function or current expression." `SortA` is a command with an in-place side
