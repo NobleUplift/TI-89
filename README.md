@@ -2,11 +2,15 @@
 
 A backup of a TI-89 Titanium graphing calculator, taken on 27 January 2009, merged with the
 earlier exports that survived. It holds the Marist High School math team's accumulated
-program set: 133 calculator variables in this repository, plus two submodules, written
-between 1998 and 2008 by eleven students and eight outside authors whose programs were
-downloaded from the public TI-89 archives.
+program set: **133 calculator variables**, plus two submodules, written between 1998 and 2008 by
+eleven students and eight outside authors whose programs were downloaded from the public TI-89
+archives.
 
-The 2009 session accounts for 101 of them. The rest come from earlier exports, chiefly one
+That 133 is a closed historical count and will not change. Programs written after the backup are
+kept here too, alongside their plain-text sources, but they are no part of the archive and are
+not counted in it.
+
+The 2009 session accounts for 101 of the 133. The rest come from earlier exports, chiefly one
 dated 16 April 2007, and six of those are the earlier home of a program the 2009 backup holds
 under a different folder. Those six are committed as renames, so the history tracks a program
 across the reorganisation rather than listing it twice. See [Moves](#moves).
@@ -167,25 +171,6 @@ Each file holds one calculator variable. Numbers are little-endian unless noted.
 Editing one by hand means updating the data length, the total file size and the checksum, or
 the calculator rejects it. `.gitattributes` marks every `.89*` file `-text` so no line-ending
 conversion can corrupt them.
-
-## TI-BASIC notes
-
-Confirmed-on-hardware syntax notes, kept here as they're discovered so they don't have to be
-rediscovered later.
-
-- **Combining every column of a Data variable into one Matrix:** `{d[1],d[2],d[3],d[4]}` (a
-  variable holding a Data type, indexed per column, wrapped in braces) evaluates directly to a
-  Matrix with one row per column — confirmed working on hardware. `list→mat(list,matrix)`
-  converts a single list to a column-matrix but takes only one list at a time; for a Data
-  variable with several columns, the brace form above is the one-shot way to get them all into
-  a single Matrix.
-- **`SortA`/`SortD` cannot be used inside a Function (`Func...EndFunc`) or any expression.**
-  Confirmed on hardware: `"SortA is invalid in a function or current expression"`. They're
-  commands with an in-place side effect, not expression functions, and a Function body is
-  restricted to `Return`, assignments, `For`/`If`/`While`, and non-mutating functions like
-  `augment()` — nothing that mutates a variable as a statement in its own right. To tally/sort
-  inside a Function, use a linear-search-and-accumulate approach instead (see
-  `DISCRETE/discrete.tally.txt` for a worked example), or move the sort into a calling Program.
 
 ## Dates
 

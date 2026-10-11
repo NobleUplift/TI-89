@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A backup of one TI-89 Titanium, exported 2009-01-27 and merged with the earlier exports that
-survived, plus a small amount of work written since. 136 calculator variables and two submodules.
+survived: 133 calculator variables and two submodules. A small amount of work has been written
+since and is kept alongside, but is no part of that 133, which is a closed historical count.
 Nothing is built, linted or tested here. The programs are 68k TI-BASIC and run on a calculator or
 an emulator (TiEmu). The only code that runs on a PC is `tools/`.
 
@@ -17,6 +18,9 @@ Further reading, in the order it usually matters:
 - `docs/PROGRAMS.md` is the per-program reference: what calls what, what is unreachable, which
   programs never worked, and which are byte-code only. Consult it when a task touches a named
   program; do not duplicate it here.
+- `docs/TI-BASIC.md` is the rules and hardware limits for **writing** TI-BASIC: name resolution,
+  Programs versus Functions, comments, screen limits, input and modes. Read it before writing or
+  editing any calculator program.
 - `docs/TOOLS.md` is what each script in `tools/` does and which format it encodes.
 - `docs/TOKENIZATION.md` is the `.89p` byte-code format and the tag tables, with sourced
   references. Read it before writing anything that parses a tokenized program.
@@ -114,7 +118,23 @@ The byte layout is documented at the top of `tools/ti89-textconv.py` and again i
   packer rewrites line endings and a file that flips between clones diffs on every checkout.
 - The comment at 0x12 is the export timestamp written by the PC link software, not part of the
   program. It changes on every backup and is noise in a diff.
-- About 26 characters fit on a `Disp` line on the 160-pixel screen.
+
+## Writing a calculator program
+
+`docs/TI-BASIC.md` is the full set. The four that come up on almost any such task:
+
+- **Fully qualify every cross-folder call**, `folder\name()`. A bare name resolves against the
+  calculator's current folder, so it fails whenever that is not the caller's own folder, and it
+  fails silently: the call stays symbolic and prints as literal expression text, or raises a
+  misleading "Domain error" from inside the callee.
+- **Anything returning a value must be a Function (`.89f`)**, not a Program. `SortA` and `SortD`
+  cannot be used inside one.
+- **Keep in-program comments short**, one brief line each. Indentation and whole-line `©`
+  comments cost nothing on the device when the program is built with `tools/ti89-pack.py`, which
+  strips both, so a `.txt` source can be laid out for a reader. That is the packer's behaviour,
+  not the calculator's: comments typed on the device itself are stored and survive compilation.
+- **26.5 characters fit on a `Disp` line** (the 27th is cut off but still partly visible), and
+  the Program I/O screen holds **6 lines** before it scrolls.
 
 ## Commits and provenance
 
