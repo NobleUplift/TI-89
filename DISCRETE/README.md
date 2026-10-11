@@ -206,3 +206,17 @@ over.
   on the same device, so despite case-insensitivity being documented elsewhere for `setMode`
   strings, this AMS build apparently is case-sensitive for this value. Use `"Approximate"`
   exactly.
+
+### Possible future improvements
+
+- **Prompt for more than one attribute in Information Gain.** Automatic currently asks for one
+  attribute column and computes its gain; it could instead ask for the class column once, then
+  loop asking for additional attribute columns, printing each one's gain in turn — letting a
+  session compare every candidate attribute without restarting. Needs a fresh copy of the class
+  column before each attribute's `SortA` (`y→y2`, then `SortA r,y2`), since `SortA` permutes `y`
+  in place to match whichever attribute it was just paired with — the same copy-before-sort
+  reason `Lbl auto` originally needed a hand-written `y→yp` before `tally` was rewritten to avoid
+  sorting at all.
+- **Let a Data variable name be set once and referenced by column index**, instead of typing the
+  full `db[1]`/`db[2]` expression at every prompt. Would save re-typing the variable name for
+  every column of the same table.
