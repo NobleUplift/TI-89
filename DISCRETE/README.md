@@ -167,6 +167,12 @@ over.
   the redundant kind removed from `Lbl top`. An error message, by contrast, prints in place (no
   `ClrIO`) directly below whatever prompt produced it, so the context of what was being entered
   stays visible; it clears on the next successful result.
+- **The Program I/O screen holds 6 lines before it starts scrolling** (confirmed on real
+  hardware). A group of `Disp` calls meant to be read together — a header, a result, an error —
+  should never total more than 6 lines between the last `ClrIO` and the next one, or the top of
+  it scrolls out of view before there's any `Pause` (or user action) to read it. `entinfo`'s
+  header is 4 lines, every result screen is at most 3, and every error is 1 — all comfortably
+  under the limit; keep any new `Disp` block within it too.
 - Every point where `entinfo` reads a value it's about to hand to `discrete\entropy` or
   `discrete\tally` (`p`, and every `r`/`y`) checks `getType(...)≠"LIST"` first and shows a short
   one-line `"Err: ..."` message with a corrected example instead of letting the crash surface
