@@ -2,11 +2,15 @@
 
 A backup of a TI-89 Titanium graphing calculator, taken on 27 January 2009, merged with the
 earlier exports that survived. It holds the Marist High School math team's accumulated
-program set: 133 calculator variables in this repository, plus two submodules, written
-between 1998 and 2008 by eleven students and eight outside authors whose programs were
-downloaded from the public TI-89 archives.
+program set: **133 calculator variables**, plus two submodules, written between 1998 and 2008 by
+eleven students and eight outside authors whose programs were downloaded from the public TI-89
+archives.
 
-The 2009 session accounts for 101 of them. The rest come from earlier exports, chiefly one
+That 133 is a closed historical count and will not change. Programs written after the backup are
+kept here too, alongside their plain-text sources, but they are no part of the archive and are
+not counted in it.
+
+The 2009 session accounts for 101 of the 133. The rest come from earlier exports, chiefly one
 dated 16 April 2007, and six of those are the earlier home of a program the 2009 backup holds
 under a different folder. Those six are committed as renames, so the history tracks a program
 across the reorganisation rather than listing it twice. See [Moves](#moves).

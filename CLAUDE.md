@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A backup of one TI-89 Titanium, exported 2009-01-27 and merged with the earlier exports that
-survived, plus a small amount of work written since. 136 calculator variables and two submodules.
+survived: 133 calculator variables and two submodules. A small amount of work has been written
+since and is kept alongside, but is no part of that 133, which is a closed historical count.
 Nothing is built, linted or tested here. The programs are 68k TI-BASIC and run on a calculator or
 an emulator (TiEmu). The only code that runs on a PC is `tools/`.
 
