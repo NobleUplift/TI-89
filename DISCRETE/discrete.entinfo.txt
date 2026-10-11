@@ -18,7 +18,14 @@ Prgm
 © wtd: weighted average child entropy
 © y: class labels, auto's second column
 © child: current child's labels, auto
-Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child
+© em: caller's Exact/Approx mode, restored on quit
+Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em
+
+© force Approximate so ln() in entropy() always evaluates to a
+© decimal instead of possibly staying symbolic through the loop;
+© restored at Lbl quit so entinfo doesn't change the caller's mode
+getMode("Exact/Approx")→em
+setMode("Exact/Approx","APPROXIMATE")
 
 Lbl top
 ClrIO
@@ -42,11 +49,27 @@ Goto calc
 
 Lbl tally
 Input "Labels {1,1,2} or db[col]",r
+If getType(r)≠"LIST" Then
+ ClrIO
+ Disp "Data type error"
+ Disp "Labels must be a list,"
+ Disp "e.g. {1,1,2}, or db[col]"
+ Pause
+ Goto top
+EndIf
 If dim(r)<1
  Goto top
 discrete\tally(r)→p
 
 Lbl calc
+If getType(p)≠"LIST" Then
+ ClrIO
+ Disp "Data type error"
+ Disp "Counts must be a list,"
+ Disp "e.g. {16,14}"
+ Pause
+ Goto top
+EndIf
 If dim(p)<1 or min(p)<0
  Goto top
 sum(p)→n
@@ -73,6 +96,14 @@ For j,1,k
  ClrIO
  Disp "Child "&string(j)&" of "&string(k)
  Input "Labels {1,1,2} or db[col]",r
+ If getType(r)≠"LIST" Then
+  ClrIO
+  Disp "Data type error"
+  Disp "Labels must be a list,"
+  Disp "e.g. {1,1,2}, or db[col]"
+  Pause
+  Goto top
+ EndIf
  If dim(r)<1
   Goto top
  augment(all,r)→all
@@ -87,6 +118,14 @@ Goto showgain
 Lbl auto
 Input "Attribute col, e.g. db[1]",r
 Input "Class col, e.g. db[2]",y
+If getType(r)≠"LIST" or getType(y)≠"LIST" Then
+ ClrIO
+ Disp "Data type error"
+ Disp "Attribute/Class must be"
+ Disp "db[col] or a list"
+ Pause
+ Goto top
+EndIf
 If dim(r)<1 or dim(r)≠dim(y)
  Goto top
 
@@ -132,6 +171,7 @@ EndDlog
 Goto top
 
 Lbl quit
+setMode("Exact/Approx",em)
 ClrIO
 DispHome
 EndPrgm

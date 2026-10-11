@@ -157,3 +157,21 @@ over.
   is typing the braces yourself.
 - `Lbl quit` runs `ClrIO` then `DispHome` so quitting returns to the Home screen instead of
   leaving the calculator on the Program I/O screen.
+- Every point where `entinfo` reads a value it's about to hand to `discrete\entropy` or
+  `discrete\tally` (`p`, and every `r`/`y`) checks `getType(...)≠"LIST"` first and shows a plain
+  "Data type error" message with a corrected example instead of letting the crash surface from
+  inside the Function on an unrelated line number — e.g. a bare `16` typed where `{16}` was
+  needed previously surfaced as `discrete\entropy`'s own "Data type" error on an unrelated line.
+- **Forces Approximate mode for the whole run, restored on quit.** `entinfo` saves the
+  calculator's current Exact/Approx setting into `em` and calls
+  `setMode("Exact/Approx","APPROXIMATE")` once before `Lbl top`, then restores it with
+  `setMode("Exact/Approx",em)` at `Lbl quit`. In Exact mode, `ln()` of a rational number can stay
+  a *symbolic* expression rather than becoming a decimal immediately, and `discrete\entropy`'s
+  loop accumulates `h` across several `ln()` calls before anything forces it to a number — real
+  hardware testing showed `H(S)` and the uniform-max calculation both returning the same wrong
+  value (`log2(3)`) regardless of the actual input, consistent with the CAS carrying a stale or
+  mis-simplified symbolic expression through the loop instead of a fresh decimal each time.
+  **The exact mode-name and value strings (`"Exact/Approx"`, `"APPROXIMATE"`) are unconfirmed
+  against the real AMS `setMode`/`getMode` spelling** — if this errors on hardware (e.g. "Invalid
+  setMode string"), that's the first thing to check against the calculator's own `catalog` entry
+  for `setMode`.
