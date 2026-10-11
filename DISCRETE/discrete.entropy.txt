@@ -1,0 +1,16 @@
+(c)
+Func
+© n: sum of c, used to normalize
+© p: c scaled to probabilities
+© i: loop index over p
+© h: running entropy, returned
+Local n,p,i,h
+sum(c)→n
+c/n→p
+0→h
+For i,1,dim(p)
+ If p[i]>0
+  h-p[i]*ln(p[i])/ln(2)→h
+EndFor
+Return {h,n}
+EndFunc

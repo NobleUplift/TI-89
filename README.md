@@ -152,6 +152,25 @@ Editing one by hand means updating the data length, the total file size and the 
 the calculator rejects it. `.gitattributes` marks every `.89*` file `-text` so no line-ending
 conversion can corrupt them.
 
+## TI-BASIC notes
+
+Confirmed-on-hardware syntax notes, kept here as they're discovered so they don't have to be
+rediscovered later.
+
+- **Combining every column of a Data variable into one Matrix:** `{d[1],d[2],d[3],d[4]}` (a
+  variable holding a Data type, indexed per column, wrapped in braces) evaluates directly to a
+  Matrix with one row per column — confirmed working on hardware. `list→mat(list,matrix)`
+  converts a single list to a column-matrix but takes only one list at a time; for a Data
+  variable with several columns, the brace form above is the one-shot way to get them all into
+  a single Matrix.
+- **`SortA`/`SortD` cannot be used inside a Function (`Func...EndFunc`) or any expression.**
+  Confirmed on hardware: `"SortA is invalid in a function or current expression"`. They're
+  commands with an in-place side effect, not expression functions, and a Function body is
+  restricted to `Return`, assignments, `For`/`If`/`While`, and non-mutating functions like
+  `augment()` — nothing that mutates a variable as a statement in its own right. To tally/sort
+  inside a Function, use a linear-search-and-accumulate approach instead (see
+  `DISCRETE/discrete.tally.txt` for a worked example), or move the sort into a calling Program.
+
 ## Dates
 
 Commit dates are authorship dates, not export dates. Where a file states a copyright year,
