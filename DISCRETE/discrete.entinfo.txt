@@ -179,7 +179,9 @@ sumnh/dim(y)→wtd
 
 Lbl showgain
 ClrIO
-Disp "Parent H = "&string(round(res[1],4))&" bits","Weighted child H = "&string(round(wtd,4))&" bits","Gain = "&string(round(res[1]-wtd,4))&" bits"
+Disp "Parent H = "&string(round(res[1],4))&" bits"
+Disp "Wtd H    = "&string(round(wtd,4))&" bits"
+Disp "Gain     = "&string(round(res[1]-wtd,4))&" bits"
 Pause
 Goto top
 
