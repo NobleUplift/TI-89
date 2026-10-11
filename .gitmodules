@@ -4,6 +4,3 @@
 [submodule "HEART"]
 	path = HEART
 	url = https://github.com/NobleUplift/HEART.git
-[submodule "RANDOM"]
-	path = RANDOM
-	url = ../RANDOM.git

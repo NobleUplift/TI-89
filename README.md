@@ -2,7 +2,7 @@
 
 A backup of a TI-89 Titanium graphing calculator, taken on 27 January 2009, merged with the
 earlier exports that survived. It holds the Marist High School math team's accumulated
-program set: 133 calculator variables in this repository, plus three submodules, written
+program set: 133 calculator variables in this repository, plus two submodules, written
 between 1998 and 2008 by eleven students and eight outside authors whose programs were
 downloaded from the public TI-89 archives.
 
@@ -34,7 +34,6 @@ incomplete without them.
 | `MATH/` | NoteFolio documents left in the `math` folder, which predates the split into subjects |
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
-| `RANDOM/` | submodule |
 | `tools/` | `.89p` diff driver, so programs show as source; `studycards.py` generates `.89y` StudyCards stacks |
 
 **Every directory is the calculator folder its files record at offset `0x0A`**, so a path

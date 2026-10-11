@@ -3,6 +3,9 @@ PERIODIC2/
 __pycache__/
 *.bak
 
+# Kept on the calculator and on disk, never published.
+RANDOM/
+
 # Not ours to redistribute: TI's stock StudyCard stacks ("SAMPLE ONLY"),
 # and main.calculus, which is College Board material.
 MAIN/StudyCards/main.calculus.89y
