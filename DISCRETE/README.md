@@ -163,15 +163,16 @@ over.
   inside the Function on an unrelated line number — e.g. a bare `16` typed where `{16}` was
   needed previously surfaced as `discrete\entropy`'s own "Data type" error on an unrelated line.
 - **Forces Approximate mode for the whole run, restored on quit.** `entinfo` saves the
-  calculator's current Exact/Approx setting into `em` and calls
-  `setMode("Exact/Approx","APPROXIMATE")` once before `Lbl top`, then restores it with
+  calculator's current Exact/Approx setting into `em` via `getMode("Exact/Approx")`, calls
+  `setMode("Exact/Approx","Approximate")` once before `Lbl top`, and restores it with
   `setMode("Exact/Approx",em)` at `Lbl quit`. In Exact mode, `ln()` of a rational number can stay
   a *symbolic* expression rather than becoming a decimal immediately, and `discrete\entropy`'s
   loop accumulates `h` across several `ln()` calls before anything forces it to a number — real
   hardware testing showed `H(S)` and the uniform-max calculation both returning the same wrong
-  value (`log2(3)`) regardless of the actual input, consistent with the CAS carrying a stale or
+  value (`log2(3)`) regardless of the actual input, consistent with the CAS carrying a
   mis-simplified symbolic expression through the loop instead of a fresh decimal each time.
-  **The exact mode-name and value strings (`"Exact/Approx"`, `"APPROXIMATE"`) are unconfirmed
-  against the real AMS `setMode`/`getMode` spelling** — if this errors on hardware (e.g. "Invalid
-  setMode string"), that's the first thing to check against the calculator's own `catalog` entry
-  for `setMode`.
+  **Confirmed working on real hardware with `"Approximate"` (capitalized first letter only) as
+  the value string** — `"APPROXIMATE"` (all caps) and `"APPROX"` both failed with a Domain error
+  on the same device, so despite case-insensitivity being documented elsewhere for `setMode`
+  strings, this AMS build apparently is case-sensitive for this value. Use `"Approximate"`
+  exactly.

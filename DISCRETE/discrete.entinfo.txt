@@ -25,7 +25,7 @@ Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em
 © decimal instead of possibly staying symbolic through the loop;
 © restored at Lbl quit so entinfo doesn't change the caller's mode
 getMode("Exact/Approx")→em
-setMode("Exact/Approx","APPROXIMATE")
+setMode("Exact/Approx","Approximate")
 
 Lbl top
 ClrIO
