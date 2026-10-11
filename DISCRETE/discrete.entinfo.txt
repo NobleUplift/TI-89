@@ -121,10 +121,18 @@ Goto showgain
 Lbl auto
 Input "Attribute col, e.g. db[1]",r
 Input "Class col, e.g. db[2]",y
-If getType(r)≠"LIST" or getType(y)≠"LIST" Then
+If getType(r)≠"LIST" Then
  ClrIO
  Disp "Data type error"
- Disp "Attribute/Class must be"
+ Disp "Attribute must be"
+ Disp "db[col] or a list"
+ Pause
+ Goto top
+EndIf
+If getType(y)≠"LIST" Then
+ ClrIO
+ Disp "Data type error"
+ Disp "Class must be"
  Disp "db[col] or a list"
  Pause
  Goto top
