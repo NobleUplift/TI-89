@@ -90,7 +90,7 @@ Pause
 Goto top
 
 Lbl gain
-Input "Number of children",k
+Input "Number of subsets",k
 If k<2
  Goto top
 {}→all
