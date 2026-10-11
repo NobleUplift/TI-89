@@ -152,6 +152,12 @@ For i,2,dim(r)
  If r[i]=cur Then
   augment(child,{y[i]})→child
  Else
+  If dim(child)<1 Then
+   ClrIO
+   Disp "Empty child at i="&string(i)
+   Pause
+   Goto top
+  EndIf
   discrete\entropy(discrete\tally(child))→res2
   sumnh+res2[2]*res2[1]→sumnh
   {y[i]}→child
@@ -160,6 +166,12 @@ For i,2,dim(r)
 EndFor
 
 © finalize the last (trailing) child
+If dim(child)<1 Then
+ ClrIO
+ Disp "Empty child at end"
+ Pause
+ Goto top
+EndIf
 discrete\entropy(discrete\tally(child))→res2
 sumnh+res2[2]*res2[1]→sumnh
 
