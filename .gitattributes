@@ -5,3 +5,9 @@
 # Show .89p programs as TI-BASIC source in diffs. Enable once per clone with:
 #     git config include.path ../.gitconfig
 *.89p diff=ti89
+
+# Program source kept as text, which tools/ti89-pack.py builds a .89p from.
+# Pinned to LF so it is identical in every clone, whatever core.autocrlf is set
+# to locally. The packer accepts either, but a file that flips between clones
+# produces a diff on every checkout.
+*.txt text eol=lf
