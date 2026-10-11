@@ -29,7 +29,10 @@ setMode("Exact/Approx","APPROXIMATE")
 
 Lbl top
 ClrIO
-Disp "Shannon Entropy","H(S) = -Σ p·log2(p)","F1: Entropy  F2: I.G.","F3: About/Quit"
+Disp "Shannon Entropy: "
+Disp "H(S) = -Σ p·log2(p)"
+Disp "Information Gain: "
+Disp "Gain = H(S) - Σ(n/N)·H(child)"
 Toolbar
  Title "Entropy"
   Item "Manual",ask
