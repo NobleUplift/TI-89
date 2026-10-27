@@ -53,10 +53,23 @@ for working through the arithmetic yourself, and the second automates the same s
     `db[col]` column. You decide which rows belong to which child. The parent is never entered
     separately, because pooling every child's labels reconstructs it exactly. For learning how a
     split's gain is assembled.
-  - *Automatic*: asks for a whole attribute column and a whole class-label column, for example
-    `mydata[1]` and `mydata[2]`, then groups rows into children by matching attribute value
-    itself, with no manual partitioning. It sorts both columns together so each row's class label
-    stays attached to its attribute value. Give it two Data columns rather than a Matrix.
+  - *Automatic*: asks for a whole class-label column and then a whole attribute column, for
+    example `mydata[2]` and then `mydata[1]`, then groups rows into children by matching
+    attribute value itself, with no manual partitioning. It sorts a copy of the class column
+    together with the attribute column, so each row's class label stays attached to its
+    attribute value. Give it two Data columns rather than a Matrix.
+
+    The class column is kept for as long as `entinfo` runs. The next time *Automatic* is chosen,
+    it shows the kept column and its row count with a *Reuse saved class* / *Enter new class*
+    PopUp; ESC returns to the toolbar. To compare attributes, choose *Automatic* again, pick
+    *Reuse*, and type only the next attribute column. The attribute column is never kept, and
+    quitting `entinfo` forgets the class column.
+
+    One `SortA` over every attribute at once could not replace the repeated runs: `SortA` orders
+    all its lists by the first one only, so every other attribute would be left grouped by the
+    first attribute's values instead of its own. That is also why each run sorts a fresh copy
+    of the class column: the kept column stays in the original row order that the next attribute
+    column is in.
 - **F3 About**: *About* for credits, and *Quit*.
 
 Quitting returns to the Home screen rather than leaving the calculator on the Program I/O screen.
@@ -69,12 +82,6 @@ reported at the prompt instead of surfacing as a failure inside one of the Funct
 
 ## Possible future improvements
 
-- **Prompt for more than one attribute in Information Gain.** Automatic currently asks for one
-  attribute column and reports its gain. It could ask for the class column once and then loop over
-  further attribute columns, printing each one's gain, so a session can compare every candidate
-  attribute without restarting. Each attribute needs a fresh copy of the class column before its
-  sort, since sorting permutes that column in place to match whichever attribute it was paired
-  with.
 - **Let a Data variable be named once and referenced by column index**, instead of typing the full
   `db[1]` or `db[2]` expression at every prompt, which would save re-entering the variable name
   for every column of the same table.
