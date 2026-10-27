@@ -16,16 +16,19 @@ Prgm
 © all: pooled labels from every subset
 © sumnh: running Σ n(subset)*H(subset)
 © wtd: weighted average subset entropy
-© y: class labels, auto's second column
+© y: class labels, auto's sorted working copy
 © child: current subset's labels, auto
 © em: caller's Exact/Approx mode, restored on quit
-Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em
+© cls: auto's class column, kept between runs
+© ch: auto's PopUp choice, 1 reuse, 2 new
+Local p,r,n,i,cur,res,res2,mx,k,j,all,sumnh,wtd,y,child,em,cls,ch
 
 © force Approximate so ln() in entropy() always evaluates to a
 © decimal instead of possibly staying symbolic through the loop;
 © restored at Lbl quit so entinfo doesn't change the caller's mode
 getMode("Exact/Approx")→em
 setMode("Exact/Approx","Approximate")
+{}→cls
 
 © ClrIO once, to clear whatever ran before us. From here on entinfo
 © owns the I/O screen and never blind-clears it again -- each path
@@ -111,18 +114,38 @@ sumnh/res[2]→wtd
 Goto showgain
 
 Lbl auto
+ClrIO
+2→ch
+If dim(cls)>0 Then
+ Disp "Saved class ("&string(dim(cls))&" rows):"
+ Disp cls
+ PopUp {"Reuse saved class","Enter new class"},ch
+ If ch=0
+  Goto top
+EndIf
+© ch=1 needs no branch: cls already holds the class column
+If ch=2 Then
+ Input "Class col, e.g. db[2]",cls
+ If getType(cls)≠"LIST" Then
+  {}→cls
+  Disp "Err: class needs list/db[col]"
+  Goto top
+ EndIf
+EndIf
+If dim(cls)<1
+ Goto top
 Input "Attribute col, e.g. db[1]",r
-Input "Class col, e.g. db[2]",y
 If getType(r)≠"LIST" Then
  Disp "Err: attrib needs list/db[col]"
  Goto top
 EndIf
-If getType(y)≠"LIST" Then
- Disp "Err: class needs list/db[col]"
+If dim(r)≠dim(cls) Then
+ Disp "Err: need "&string(dim(cls))&" rows"
  Goto top
 EndIf
-If dim(r)<1 or dim(r)≠dim(y)
- Goto top
+
+© SortA permutes y in place, so it sorts a copy and cls keeps the original row order for the next attribute
+cls→y
 
 © parent entropy from the whole class column; tally(y) only reads y, so it stays row-aligned with r for the grouping pass below
 discrete\entropy(discrete\tally(y))→res
