@@ -3,7 +3,7 @@
 How a TI-68k TI-BASIC program is encoded as byte-code, and the tag tables needed to read it.
 
 A program in a `.89p` container is stored one of two ways: as plain source text, or as byte-code.
-47 of the 102 `.89p`/`.89f` programs in this repository are byte-code, which is why
+47 of the 108 `.89p`/`.89f` programs in this repository are byte-code, which is why
 `tools/ti89-textconv.py` can only hex-dump them and `tools/ti89-detok.py` exists.
 
 Which form a program is in records **what happened to it last**, not whether it was ever run.

@@ -1,0 +1,6 @@
+(s)
+Func
+© s: weka\stat's return {acc,prec,rec,spec}
+© {FP rate, FN rate, balanced accuracy, error rate}
+Return approx({1-s[4],1-s[3],(s[3]+s[4])/2,1-s[1]})
+EndFunc

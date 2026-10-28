@@ -36,6 +36,7 @@ incomplete without them.
 | `MAIN/NoteFolio/` | NoteFolio documents, including the programmer's manual; `tools/notefolio.py` reads and builds them |
 | `MAIN/StudyCards/` | StudyCards stacks for Latin and Western Civilization |
 | `MATH/` | NoteFolio documents left in the `math` folder, which predates the split into subjects |
+| `WEKA/` | WEKA-style classifier evaluation, added in 2026: accuracy, precision, F1, MCC, kappa and weighted averages from a confusion matrix |
 | `PERIODIC/` | submodule: periodic table browser |
 | `HEART/` | submodule |
 | `tools/` | `.89p` diff driver and packer, so programs show as source and can be rebuilt from text; `studycards.py` and `notefolio.py` read and build `.89y` documents |

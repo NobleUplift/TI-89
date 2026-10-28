@@ -1,0 +1,25 @@
+(m,i)
+Func
+© m: confusion matrix, rows actual, columns predicted
+© i: class to report, one-vs-rest
+© tp,fn,fp,tn: counts for class i, returned
+© n: total of every cell
+© j,k: loop indices
+Local tp,fn,fp,tn,n,j,k
+m[i,i]→tp
+0→fn
+0→fp
+0→n
+For j,1,rowDim(m)
+ © fn and fp start as the whole of row i and column i, tp included
+ fn+m[i,j]→fn
+ fp+m[j,i]→fp
+ For k,1,colDim(m)
+  n+m[j,k]→n
+ EndFor
+EndFor
+fn-tp→fn
+fp-tp→fp
+n-tp-fn-fp→tn
+Return {tp,fn,fp,tn}
+EndFunc
