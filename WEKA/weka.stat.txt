@@ -1,0 +1,12 @@
+(c)
+Func
+© c: counts {tp,fn,fp,tn}
+© tp,fn,fp,tn: c unpacked
+Local tp,fn,fp,tn
+c[1]→tp
+c[2]→fn
+c[3]→fp
+c[4]→tn
+© {accuracy, precision, recall, specificity}; a 0/0 ratio is undef, as WEKA prints ?
+Return approx({(tp+tn)/(tp+fn+fp+tn),tp/(tp+fp),tp/(tp+fn),tn/(tn+fp)})
+EndFunc

@@ -1,0 +1,164 @@
+()
+Prgm
+© weka: menu for WEKA-style classifier evaluation; the math lives in weka\cnt, stat, rate, scr and avg -- see WEKA/README.md.
+© m: confusion matrix, or 0 until one is entered
+© c: counts {tp,fn,fp,tn} for the pages
+© s: weka\stat's return
+© r: weka\rate's return
+© t: weka\scr's return
+© a: weka\avg's return
+© tp,tn,fp,fn: binary counts as typed
+© i,j: class index and loop indices
+© em: caller's Exact/Approx mode, restored on quit
+Local m,c,s,r,t,a,tp,tn,fp,fn,i,j,em
+
+getMode("Exact/Approx")→em
+setMode("Exact/Approx","Approximate")
+0→m
+
+ClrIO
+Disp "WEKA-style evaluation"
+Disp "F1: TP, TN, FP, FN"
+Disp "F2: N×N confusion matrix"
+Disp "Row=actual, col=predicted"
+
+Lbl top
+Toolbar
+ Title "Binary"
+  Item "Enter counts",binary
+ Title "Matrix"
+  Item "Enter matrix",matrix
+  Item "Per class",perclass
+  Item "Weighted avg",summary
+ Title "About"
+  Item "About",about
+  Item "Quit",quit
+EndTBar
+Goto top
+
+Lbl binary
+Input "TP",tp
+Input "TN",tn
+Input "FP",fp
+Input "FN",fn
+If getType(tp)≠"NUM" or getType(tn)≠"NUM" or getType(fp)≠"NUM" or getType(fn)≠"NUM" Then
+ Disp "Err: counts not numbers"
+ Goto top
+EndIf
+If min({tp,tn,fp,fn})<0 or tp+tn+fp+fn≤0 Then
+ Disp "Err: need ≥0, not all 0"
+ Goto top
+EndIf
+{tp,fn,fp,tn}→c
+Goto show
+
+Lbl matrix
+Input "Matrix [[50,3][4,43]]",m
+If getType(m)≠"MAT" Then
+ Disp "Err: need [[50,3][4,43]]"
+ 0→m
+ Goto top
+EndIf
+If rowDim(m)≠colDim(m) or rowDim(m)<2 Then
+ Disp "Err: need square, 2×2 up"
+ 0→m
+ Goto top
+EndIf
+For i,1,rowDim(m)
+ For j,1,colDim(m)
+  If getType(m[i,j])≠"NUM" Then
+   Disp "Err: entries not numbers"
+   0→m
+   Goto top
+  EndIf
+  If m[i,j]<0 Then
+   Disp "Err: entries must be ≥0"
+   0→m
+   Goto top
+  EndIf
+ EndFor
+EndFor
+If sum(weka\cnt(m,1))≤0 Then
+ Disp "Err: matrix is all 0"
+ 0→m
+ Goto top
+EndIf
+Goto summary
+
+Lbl perclass
+If getType(m)≠"MAT" Then
+ Disp "Err: enter a matrix first"
+ Goto top
+EndIf
+Disp "Classes 1 to "&string(rowDim(m))
+Input "Class",i
+If getType(i)≠"NUM" Then
+ Disp "Err: class not a number"
+ Goto top
+EndIf
+If i<1 or i>rowDim(m) or fPart(i)≠0 Then
+ Disp "Err: no such class"
+ Goto top
+EndIf
+weka\cnt(m,i)→c
+Goto show
+
+© three pages, one per Function, for the counts in c
+Lbl show
+weka\stat(c)→s
+weka\rate(s)→r
+weka\scr(c)→t
+ClrIO
+Disp "Stats (1/3)"
+Disp "Accuracy    "&string(round(s[1],4))
+Disp "Precision   "&string(round(s[2],4))
+Disp "Recall      "&string(round(s[3],4))
+Disp "Specificity "&string(round(s[4],4))
+Pause
+ClrIO
+Disp "Rates (2/3)"
+Disp "FP rate     "&string(round(r[1],4))
+Disp "FN rate     "&string(round(r[2],4))
+Disp "Balanced    "&string(round(r[3],4))
+Disp "Error rate  "&string(round(r[4],4))
+Pause
+ClrIO
+Disp "Scores (3/3)"
+Disp "F1          "&string(round(t[1],4))
+Disp "MCC         "&string(round(t[2],4))
+Disp "NPV         "&string(round(t[3],4))
+Disp "Kappa       "&string(round(t[4],4))
+Goto top
+
+Lbl summary
+If getType(m)≠"MAT" Then
+ Disp "Err: enter a matrix first"
+ Goto top
+EndIf
+weka\avg(m)→a
+ClrIO
+Disp "Weighted avg"
+Disp "Precision   "&string(round(a[1],4))
+Disp "Recall      "&string(round(a[2],4))
+Disp "FP rate     "&string(round(a[3],4))
+Disp "F1          "&string(round(a[4],4))
+Disp "MCC         "&string(round(a[5],4))
+Goto top
+
+Lbl about
+Dialog
+ Title "WEKA-style evaluation"
+ Text "Classifier evaluation"
+ Text "for the TI-89"
+ Text "By Patrick Seiter and"
+ Text "Claude (Anthropic), 2026"
+ Text "Not affiliated with WEKA"
+ Text "or the Univ. of Waikato"
+EndDlog
+Goto top
+
+Lbl quit
+setMode("Exact/Approx",em)
+ClrIO
+DispHome
+EndPrgm

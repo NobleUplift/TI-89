@@ -1,0 +1,35 @@
+(m)
+Func
+© m: confusion matrix, rows actual, columns predicted
+© c: weka\cnt's counts for the current class
+© s: weka\stat for that class
+© r: weka\rate for that class
+© t: weka\scr for that class
+© w: actual count of that class, its weight
+© i: loop index over classes
+© wp,wr,wf,wf1,wm: running weighted sums
+Local c,s,r,t,w,i,wp,wr,wf,wf1,wm
+0→wp
+0→wr
+0→wf
+0→wf1
+0→wm
+For i,1,rowDim(m)
+ weka\cnt(m,i)→c
+ c[1]+c[2]→w
+ © WEKA skips a class with no actual instances; any other undef carries into the sum, as WEKA prints ?
+ If w>0 Then
+  weka\stat(c)→s
+  weka\rate(s)→r
+  weka\scr(c)→t
+  wp+w*s[2]→wp
+  wr+w*s[3]→wr
+  wf+w*r[1]→wf
+  wf1+w*t[1]→wf1
+  wm+w*t[2]→wm
+ EndIf
+EndFor
+© sum(c) is N for every class, so the last class's counts give it
+© {precision, recall, FP rate, F1, MCC}, each weighted by class size
+Return approx({wp,wr,wf,wf1,wm}/sum(c))
+EndFunc

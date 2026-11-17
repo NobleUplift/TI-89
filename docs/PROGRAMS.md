@@ -13,11 +13,14 @@ and the file format.
 
 ## Scope
 
-**Everything below describes the 2009 calculator set.** Three programs added in 2026 are not part
-of it and are not catalogued here, because none of the findings apply to them: `discrete\entinfo`
-with its two helper Functions `discrete\entropy` and `discrete\tally`. They form a closed cluster
-that nothing else calls and that calls nothing else, documented in `DISCRETE/README.md`, with
-`.txt` sources committed beside the containers. Unlike the archived programs they may be edited
+**Everything below describes the 2009 calculator set.** Nine programs added in 2026 are not part
+of it and are not catalogued here, because none of the findings apply to them. They form two
+closed clusters that nothing else calls and that call nothing outside themselves, each with
+`.txt` sources committed beside the containers:
+- `discrete\entinfo` with its two helper Functions `discrete\entropy` and `discrete\tally`,
+  documented in `DISCRETE/README.md`;
+- the `weka` folder, `weka\weka` with its five Functions `weka\cnt`, `weka\stat`, `weka\rate`,
+  `weka\scr` and `weka\avg`, documented in `WEKA/README.md`. Unlike the archived programs they may be edited
 and fixed. Treat the counts here as counts of the archive, not of the repository.
 
 ## Coverage, and what it does not cover
@@ -37,7 +40,7 @@ the most likely source of further findings.
 
 ## Tokenized programs, priority to export
 
-47 of the 102 tracked `.89p`/`.89f` programs are stored as byte-code rather than source, 74,119
+47 of the 108 tracked `.89p`/`.89f` programs are stored as byte-code rather than source, 74,119
 bytes in total. All 47 are from the 2009 set.
 The diff driver prints them as a hex dump, which means they are invisible to review: they cannot
 be label-audited, searched for a formula, or diffed meaningfully. Recovering them as text is the

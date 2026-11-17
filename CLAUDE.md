@@ -44,9 +44,9 @@ time is the thing being preserved, including the parts that are broken.
 - When one of them looks wrong, the useful output is a note, not a patch.
 
 **Programs written after the backup are ordinary code** and may be edited, fixed and extended.
-`discrete\entinfo`, `discrete\entropy` and `discrete\tally` are the current examples: added in
-2026, with `.txt` sources committed beside the containers and `DISCRETE/README.md` explaining
-them. New work follows that pattern (a `.txt` source that `tools/ti89-pack.py` builds), and must
+`discrete\entinfo`, `discrete\entropy` and `discrete\tally` are the current examples, along with
+the whole `weka` folder (`weka\weka` and its five Functions): added in 2026, with `.txt` sources
+committed beside the containers and `DISCRETE/README.md` and `WEKA/README.md` explaining them. New work follows that pattern (a `.txt` source that `tools/ti89-pack.py` builds), and must
 not alter, renumber or re-home anything from the 2009 set.
 
 ## Commands
@@ -112,7 +112,7 @@ The byte layout is documented at the top of `tools/ti89-textconv.py` and again i
   at 0x4C (little-endian), and the trailing checksum. Miss one and the calculator rejects the
   file. `tools/ti89-pack.py` does all three.
 - Programs stored as source text use CR line endings in the TI character set and end with the
-  `0x08` text flag. Of the 102 tracked `.89p`/`.89f` programs, 55 are text and 47 are byte-code,
+  `0x08` text flag. Of the 108 tracked `.89p`/`.89f` programs, 61 are text and 47 are byte-code,
   which the diff driver shows as a hex dump. (`history\factors.89z` is assembly, and is neither.)
 - A `.txt` source committed beside a container is pinned to LF by `.gitattributes`, because the
   packer rewrites line endings and a file that flips between clones diffs on every checkout.

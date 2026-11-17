@@ -1,0 +1,33 @@
+(c)
+Func
+© c: counts {tp,fn,fp,tn}
+© tp,fn,fp,tn: c unpacked
+© n: total count
+© p,r: precision and recall, for f1
+© f1: F-measure
+© pe: kappa's chance agreement
+© ka: kappa
+Local tp,fn,fp,tn,n,p,r,f1,pe,ka
+c[1]→tp
+c[2]→fn
+c[3]→fp
+c[4]→tn
+tp+fn+fp+tn→n
+tp/(tp+fp)→p
+tp/(tp+fn)→r
+© WEKA's rule: f1 is 0 when precision and recall are both 0, and undef when either is undef; tested on counts, since a test on undef raises an error
+If tp=0 and tp+fp>0 and tp+fn>0 Then
+ 0→f1
+Else
+ 2*p*r/(p+r)→f1
+EndIf
+((tp+fn)*(tp+fp)+(fp+tn)*(fn+tn))/n^2→pe
+© WEKA's rule: kappa is 1 when chance agreement is 1
+If pe<1 Then
+ ((tp+tn)/n-pe)/(1-pe)→ka
+Else
+ 1→ka
+EndIf
+© {F1, MCC, NPV, kappa}
+Return approx({f1,(tp*tn-fp*fn)/√((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)),tn/(tn+fn),ka})
+EndFunc
